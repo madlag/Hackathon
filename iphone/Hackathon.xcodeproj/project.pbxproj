@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		994F25481464AEE600A2809E /* ScenarioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 994F25461464AEE600A2809E /* ScenarioViewController.m */; };
+		994F25491464AEE600A2809E /* ScenarioViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 994F25471464AEE600A2809E /* ScenarioViewController.xib */; };
 		997A2EA314648865003C38BD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A2EA214648865003C38BD /* UIKit.framework */; };
 		997A2EA514648865003C38BD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A2EA414648865003C38BD /* Foundation.framework */; };
 		997A2EA714648865003C38BD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A2EA614648865003C38BD /* CoreGraphics.framework */; };
@@ -19,6 +21,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		994F25451464AEE600A2809E /* ScenarioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenarioViewController.h; sourceTree = "<group>"; };
+		994F25461464AEE600A2809E /* ScenarioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScenarioViewController.m; sourceTree = "<group>"; };
+		994F25471464AEE600A2809E /* ScenarioViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ScenarioViewController.xib; sourceTree = "<group>"; };
 		997A2E9E14648865003C38BD /* Hackathon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackathon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		997A2EA214648865003C38BD /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		997A2EA414648865003C38BD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -85,6 +90,9 @@
 				997A2EB514648865003C38BD /* CameraOverlayViewController.m */,
 				997A2EB714648865003C38BD /* CameraOverlayViewController_iPhone.xib */,
 				997A2EBA14648865003C38BD /* CameraOverlayViewController_iPad.xib */,
+				994F25451464AEE600A2809E /* ScenarioViewController.h */,
+				994F25461464AEE600A2809E /* ScenarioViewController.m */,
+				994F25471464AEE600A2809E /* ScenarioViewController.xib */,
 				997A2EA914648865003C38BD /* Supporting Files */,
 			);
 			path = Hackathon;
@@ -155,6 +163,7 @@
 				997A2EAD14648865003C38BD /* InfoPlist.strings in Resources */,
 				997A2EB914648865003C38BD /* CameraOverlayViewController_iPhone.xib in Resources */,
 				997A2EBC14648865003C38BD /* CameraOverlayViewController_iPad.xib in Resources */,
+				994F25491464AEE600A2809E /* ScenarioViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,6 +177,7 @@
 				997A2EAF14648865003C38BD /* main.m in Sources */,
 				997A2EB314648865003C38BD /* AppDelegate.m in Sources */,
 				997A2EB614648865003C38BD /* CameraOverlayViewController.m in Sources */,
+				994F25481464AEE600A2809E /* ScenarioViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

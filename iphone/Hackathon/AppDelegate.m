@@ -8,23 +8,22 @@
 
 #import "AppDelegate.h"
 
-#import "CameraOverlayViewController.h"
-
+#import "ScenarioViewController.h"
 @implementation AppDelegate
 
 @synthesize window = _window;
-@synthesize viewController = _viewController;
+@synthesize navigationController = _navigationController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        self.viewController = [[CameraOverlayViewController alloc] initWithNibName:@"ViewController_iPhone" bundle:nil];
+        ScenarioViewController *scenarioViewController = [[[ScenarioViewController alloc] initWithNibName:@"ScenarioViewController" bundle:nil] autorelease];
+        self.navigationController = [[[UINavigationController alloc] initWithRootViewController:scenarioViewController] autorelease];
+        self.window.rootViewController = self.navigationController;
     } else {
-        self.viewController = [[CameraOverlayViewController alloc] initWithNibName:@"ViewController_iPad" bundle:nil];
     }
-    self.window.rootViewController = self.viewController.imagePickerController;
     [self.window makeKeyAndVisible];
     return YES;
 }
