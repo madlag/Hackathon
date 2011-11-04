@@ -8,6 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
+@interface CameraOverlayViewController : UIViewController <UIImagePickerControllerDelegate, UIActionSheetDelegate>
+{
+    UIImagePickerController *imagePickerController;
+}
+
+- (IBAction)showActions:(id)sender;
+- (IBAction)takePicture:(id)sender;
+
+@property (nonatomic, retain) UIImagePickerController *imagePickerController;
 
 @end
