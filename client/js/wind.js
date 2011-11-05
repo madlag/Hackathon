@@ -35,11 +35,16 @@ function CheckNaN(a) {
 
 TransitionUpdateCallback.prototype = {
 
-    getVelocityField: function (pos, time ) {
-        var t = time/1000.0;
+    getVelocityField: function (posOri, time ) {
+        var t = time/1000.0 % 2.0;
+        var pos = posOri.slice(0);
+        var scale = 1.0/100.0;
+        pos[0]*= scale; 
+        pos[1]*= scale; 
+        pos[2]*= scale; 
         var vx = 0.0+Math.cos(0.5+2.0*(pos[0]*pos[0]*t));
         var vy = Math.cos(4.0*(pos[1]*t) + Math.sin(4.0*pos[0]*t*t));
-        var vz = Math.cos(pos[2]*2.0*t);
+        var vz = Math.cos(pos[0]*pos[2]*2.0*t);
         var factor = 0.1;
         var vec = [ vx, vy, vz];
         osg.Vec3.normalize(vec, vec);
@@ -48,10 +53,16 @@ TransitionUpdateCallback.prototype = {
         vec[2] *= factor;
         return vec;
     },
-    updateMaterial: function(distanceSqr, stateset) {
+    updateMaterial: function(distanceSqr, stateset, dt) {
         var startFade = TransitionParameter.distanceFade;
         startFade *= startFade;
         var fadeRatio = osgAnimation.EaseInCubic(Math.min(distanceSqr/startFade, 1.0));
+        var stop = 4.0;
+        var duration = 4.0;
+        var timeFade = dt - stop;
+        timeFade = Math.max(timeFade, 0.0)/duration;
+        fadeRatio *= Math.max((1.0-timeFade), 0.0);
+
         var alphaUniform = stateset.getUniform('fade');
         if (alphaUniform === undefined) {
             alphaUniform = osg.Uniform.createFloat1(1.0, 'fade');
@@ -70,6 +81,7 @@ TransitionUpdateCallback.prototype = {
         if (node._lastUpdate < 0) {
             node._start += t;
             node._lastUpdate = node._start;
+            node._startDissolve += t;
         }
 
         var dt = t - node._lastUpdate;
@@ -95,11 +107,11 @@ TransitionUpdateCallback.prototype = {
 
         var speedSqr = dx*dx + dy*dy + dz*dz;
 
-        if (!this.updateMaterial(speedSqr, node.getOrCreateStateSet())) {
+        if (!this.updateMaterial(speedSqr, node.getOrCreateStateSet(), t - node._start)) {
             node.setNodeMask(0x0);
             return false;
         }
-        var maxSpeed = 1.0;
+        var maxSpeed = node.maxSpeed;
         var maxSpeedSqr = maxSpeed*maxSpeed;
         if (speedSqr > maxSpeedSqr) {
             var quot = maxSpeed/Math.sqrt(speedSqr);
@@ -108,7 +120,8 @@ TransitionUpdateCallback.prototype = {
             dz *= quot;
         }
         
-        var ratio = osgAnimation.EaseInQuad(Math.min((t-node._startDissolve)/2.0, 1.0));
+        var ddt = Math.max((t-node._startDissolve)/2.0,0.0);
+        var ratio = osgAnimation.EaseInQuad(Math.min(ddt, 1.0));
         ratio = Math.max(ratio, 0.0);
 
         var attractVector = [];
@@ -138,7 +151,8 @@ TransitionUpdateCallback.prototype = {
         osg.Vec3.copy(current, node._currentPosition);
 
         var localRotation = [];
-        osg.Matrix.makeRotate((t-node._startDissolve)*2.0 * ratio, node._axis[0], node._axis[1], node._axis[2] , localRotation);
+        var rotatedissolve = Math.max(t-node._startDissolve, 0);
+        osg.Matrix.makeRotate(rotatedissolve*2.0 * ratio, node._axis[0], node._axis[1], node._axis[2] , localRotation);
         osg.Matrix.mult(node._rotation, localRotation, m);
 
         osg.Matrix.setTrans(m, current[0], current[1], current[2]);
@@ -250,7 +264,7 @@ var createWindEffect = function(texture, target, matrix, time, width, initialSpe
 
 
     var totalSizeX = width;
-    var maxx = 8;
+    var maxx = 16;
 
     var sizex = totalSizeX/maxx;
     var maxy = maxx/Ratio;
@@ -290,13 +304,14 @@ var createWindEffect = function(texture, target, matrix, time, width, initialSpe
             group.addChild(mtr);
             mtr.addUpdateCallback(cb);
             var t = time;
-            var t2 = (x*maxy + y)*0.07 + time;
+            var t2 = (x*maxy + y)*0.01;
             mtr._lastUpdate = -1;
             mtr._startDissolve = t2;
             mtr._start = t;
             mtr._axis = [ Math.random(), Math.random(), Math.random()];
             mtr._initialSpeed = initialSpeed;
             mtr._rotation = [];
+            mtr.maxSpeed = 0.2 + Math.random() * 10.0;
             osg.Matrix.copy(matrix, mtr._rotation);
             osg.Matrix.setTrans(mtr._rotation, 0,0,0);
 

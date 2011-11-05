@@ -43,9 +43,14 @@ var main = function() {
         var scene = world.getScene();
 
         viewer.getCamera().setClearColor([0.0, 0.0, 0.0, 0.0]);
-        viewer.setSceneData(scene);
         viewer.setupManipulator();
         viewer.getManipulator().computeHomePosition();
+        viewer.getManipulator().setTarget([0,0,0]);
+        viewer.getManipulator().setDistance(300);
+        viewer.getManipulator().getInverseMatrix = function() {
+            return osg.Matrix.makeLookAt([0,-600,0], [0,0,0], [0,0,1], []);
+        };
+        viewer.setSceneData(scene);
 
         viewer.run();
         Viewer = viewer;
@@ -163,12 +168,14 @@ UpdatePhotoCallback.prototype = {
         }
         
         var trans = [];
-        var ratio = osgAnimation.EaseOutQuad(Math.min(dt*0.5, 1.0));
-        if (dt > 4.0) {
+        var ratio = osgAnimation.EaseOutQuad(Math.min(dt, 1.0));
+        if (dt > 3.0) {
 
             var parent = node.getParents()[0];
             var m = node.getWorldMatrices()[0];
-            var effect = createWindEffect(node.texture, [-10000, 0,0], m, 1.0, Width);
+            var range = 400;
+            var depth = -1000;
+            var effect = createWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 1.0, Width);
             parent.addChild(effect);
             node.setNodeMask(0x0);
             //node.effect.setNodeMask(~0x0);
@@ -198,6 +205,28 @@ var Organizer = function(x, y) {
     this._root = new osg.MatrixTransform();
     this._root.getOrCreateStateSet().setAttributeAndMode(getQuadShader());
 
+    var w = Width;
+    var h = Width/Ratio;
+    var space = 10;
+
+    this._layouts = [
+        [ [ -w/2 - space/2, h/2+space/2],
+          [ w/2 + space/2, h/2+space/2],
+          [ 0, -h/2 -space/2]
+        ],
+
+        [ [ -w/2 - space/2, 0],
+          [ w/2 + space/2, 0]
+        ],
+
+        [ [ -w/2 - space/2, h/2+space/2],
+          [ w/2 + space/2, h/2+space/2],
+          [ -w/2 - space/2, -h/2 -space/2],
+          [ w/2 + space/2, -h/2 -space/2]
+        ]
+    ];
+
+    this._layout = this.getLayout();
 };
 
 Organizer.prototype = {
@@ -212,13 +241,17 @@ Organizer.prototype = {
         newone.select();
     },
 
+    getLayout: function() {
+        var idx = Math.floor(Math.random() * (this._layouts.length)) % this._layouts.length;
+        return this._layouts[idx];
+    },
+
     push: function(q) {
 
         if (this._full) {
             return false;
         }
 
-        var space = 10;
         q.addUpdateCallback(new UpdatePhotoCallback());
         q.lastUpdate = false;
         var fade = osg.Uniform.createFloat1(0.0,'fade');
@@ -238,10 +271,7 @@ Organizer.prototype = {
         q.getOrCreateStateSet().setAttributeAndMode(material);
         q.getOrCreateStateSet().setAttributeAndMode(new osg.BlendFunc('ONE', 'ONE_MINUS_SRC_ALPHA'));
 
-        var layout = [ [ -w/2 - space/2, h/2+space/2],
-                       [ w/2 + space/2, h/2+space/2],
-                       [ 0, -h/2 -space/2]
-                     ];
+        var layout = this._layout;
 
         q.position = layout[this._currentPos];
         this._currentPos++;
@@ -259,33 +289,7 @@ Organizer.prototype = {
             this._images[i].lastUpdate = -1;
             this._images[i].startTime = Math.random();
         }
-    },
-
-    createMain: function() {
-        var scale = 9;
-        var node = new osg.MatrixTransform();
-        osg.Matrix.makeTranslate(0.25*Width,
-                                 depth,
-                                 0.25*Width/Ratio,
-                                 node.getMatrix());
-
-        osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeScale(scale,
-                                                                  scale,
-                                                                  scale,
-                                                                  []));
-        
-        var t0 = this._textures[0];
-        var t1 = this._textures[1];
-
-        //node.addChild(createEffect(t0, t1, Width));
-        this._root.addChild(createWindEffect(t0, [-10000, 0,0], node.getMatrix(), 1.0, Width));
-
-
-        this._root.addChild(node);
-        this._main = node;
-    },
-    setMainNode: function(main) { this._main = main; },
-    getMainNode: function() { return this._main; }
+    }
 
 };
 
@@ -360,11 +364,24 @@ var getDummyImage = function() {
 };
 
 
+
 var World = function() {
     this._groups = [];
     this._currentGroup;
     this._scene = new osg.Node();
     this.createGroup();
+
+    var fakeEventImage = function(event) {
+        if (event.keyCode === 32) {
+            WorldGallery.addImage(getFakeImageURL());
+            WorldGallery.addImage(getFakeImageURL());
+            WorldGallery.addImage(getFakeImageURL());
+            WorldGallery.addImage(getFakeImageURL());
+        }
+    };
+
+    window.addEventListener("keyup", fakeEventImage, false);
+
 };
 
 World.prototype = {
@@ -384,6 +401,9 @@ World.prototype = {
     },
 
     createQuadFromImage: function(img) {
+        if (this.isFull()) {
+            return;
+        }
         var node = new osg.MatrixTransform();
         var q = createQuad(img);
         node.addChild(q);
@@ -410,14 +430,6 @@ World.prototype = {
 
 
 
-var fakeEventImage = function(event) {
-    WorldGallery.addImage(getFakeImageURL());
-    WorldGallery.addImage(getFakeImageURL());
-    WorldGallery.addImage(getFakeImageURL());
-
-    
-};
 
 window.addEventListener("load", main ,true);
-window.addEventListener("keyup", fakeEventImage, false);
 
