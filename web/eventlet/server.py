@@ -10,7 +10,7 @@ import redis
 import eventlet.pools
 import thumb
 
-ADRESS="192.168.0.75"
+ADRESS="0.0.0.0"
 STORAGE="/tmp/storage/"
 #ADRESS="169.254.205.154"
 PORT = 7000
@@ -237,9 +237,6 @@ class App:
                 ret = open(html_path).read()
             except Exception, e:
                 ret = ""
-
-            if path.startswith("webclient"):
-                ret = ret % {'server': "%s:%s" % (ADRESS,PORT)}
 
             start_response('200 OK', [('content-type', 'text/html')])
             
