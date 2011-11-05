@@ -209,8 +209,8 @@ var createEffect = function(texture0, texture1, width) {
     var totalSizeX = width;
     var maxx = 20;
 
-    var uvs = cropImage(1920,
-                        1080,
+    var uvs = cropImage(texture0.getImage().width,
+                        texture0.getImage().height,
                         Ratio,
                         Width);
 

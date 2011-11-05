@@ -94,6 +94,7 @@ var cropImage = function(w,h, aspect, wrequire) {
     return [ [ustart, vstart], [uend, vend] ];
 };
 
+var testDissolve = false;
 var Organizer = function(x, y) {
     this._x = x;
     this._y = y;
@@ -134,6 +135,10 @@ Organizer.prototype = {
         if (this._currentSide === 0) {
             q.position = [this._currentPos, this._y-1];
             this._currentPos++;
+            if (!testDissolve) {
+                this.createMain();
+                testDissolve = true;
+            }
             
             if (this._currentPos >= this._x) {
                 this._currentSide++;
@@ -166,7 +171,7 @@ Organizer.prototype = {
                 this._currentSide = 0;
                 this._currentPos = 0;
                 this._full = true;
-                this.createMain();
+                //this.createMain();
             }
         }
 
@@ -182,14 +187,17 @@ Organizer.prototype = {
                                  node.getMatrix());
 
         osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeScale(scale,
-                                                                  1.0,
+                                                                  scale,
                                                                   scale,
                                                                   []));
         
         var t0 = this._textures[0];
         var t1 = this._textures[1];
 
-        node.addChild(createEffect(t0, t1, Width));
+        //node.addChild(createEffect(t0, t1, Width));
+        this._root.addChild(createWindEffect(t0, [-1000, 0,0], node.getMatrix(), 1.0, Width));
+
+
         this._root.addChild(node);
         this._main = node;
     },
@@ -353,6 +361,7 @@ var getImage = function() {
         t1.setImage(getDummyImage());
 
         node.addChild(createEffect(t0, t1, Width));
+
         organize.setMainNode(node);
         Scene.addChild(node);
         return false;
