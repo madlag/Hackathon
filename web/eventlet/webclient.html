@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-<!--
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
--->
-<script src="jquery-1.4.3.min.js"></script>
+<script type="text/javascript" src="js/swfobject.js"></script>
+<script type="text/javascript" src="js/web_socket.js"></script>
+<script src="js/jquery-1.4.3.min.js"></script>
+<script src="js/json2.js"></script>
+
 </head>
 <body>
 <h3>Chat!</h3>
@@ -18,9 +19,13 @@
 <input type="submit" />
 </form>
 
-<script src="json2.js"></script>
 
 <script>
+
+  WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
+  // Set this to dump debug message from Flash to console.log:
+  WEB_SOCKET_DEBUG = true;
+
 
 window.onload = function() {
   var data = {};
