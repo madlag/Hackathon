@@ -8,8 +8,8 @@
 
 #import "ScenarioViewController.h"
 #import "Scenario.h"
-
 @implementation ScenarioViewController
+@synthesize scenarii;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -29,12 +29,34 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+- (void) dealloc {
+    [scenarii release];
+    [super dealloc];
+}
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
+    self.scenarii = [Scenario getAll];
+    
+    // Configure navigation item
+    self.navigationItem.title = NSLocalizedString(@"Scenarii", nil);
+    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(onAdd:)] autorelease];
+    
+    // First time user: no scenario
+    if (0 == [scenarii count]) {
+        CodeInputViewController *codeInput = [[CodeInputViewController alloc] initWithNibName:@"CodeInputViewController" bundle:nil];
+        [codeInput setShowCancel:NO];
+        codeInput.delegate = self;
+        UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:codeInput];
+        [self presentModalViewController:nav animated:NO];
+        [codeInput release];
+        [nav release];
+        
+    }
+    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  
@@ -79,16 +101,14 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-#warning Potentially incomplete method implementation.
     // Return the number of sections.
-    return 0;
+    return 0 == [scenarii count] ? 0 : 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return 0;
+    return [scenarii count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -98,9 +118,12 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
     // Configure the cell...
+    Scenario *s = (Scenario *)[scenarii objectAtIndex:[indexPath row]];
+    cell.textLabel.text = s.name;
     
     return cell;
 }
@@ -156,6 +179,20 @@
      [self.navigationController pushViewController:detailViewController animated:YES];
      [detailViewController release];
      */
+}
+
+#pragma mark - Code Input
+
+- (void)codeInputViewController:(CodeInputViewController *)c doneWithScenario:(Scenario *)s {
+    
+    [s save];
+    self.scenarii = [Scenario getAll];
+    [self.tableView reloadData];
+//    [self 
+}
+
+- (void)onAdd:(id)sender {
+    
 }
 
 @end

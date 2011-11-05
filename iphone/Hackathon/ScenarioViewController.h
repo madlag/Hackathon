@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CodeInputViewController.h"
 
-@interface ScenarioViewController : UITableViewController
+@interface ScenarioViewController : UITableViewController <CodeInputViewControllerDelegate> {
+    NSArray *scenarii;
+}
+
+@property (atomic, retain) NSArray *scenarii;
+
+- (void)onAdd:(id)sender;
 
 @end

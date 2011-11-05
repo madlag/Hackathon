@@ -7,6 +7,7 @@
 //
 
 #import "Scenario.h"
+#import "Scene.h"
 
 static NSMutableDictionary* _data = nil;
 
@@ -14,7 +15,7 @@ static NSMutableDictionary* _data = nil;
 
 + (NSMutableDictionary*) getData {
     if (nil == _data) {
-        _data = [NSMutableDictionary dictionaryWithContentsOfFile:[self savePath]];
+        _data = [[NSMutableDictionary dictionaryWithContentsOfFile:[self savePath]] retain];
         if (nil == _data)
             _data = [[NSMutableDictionary alloc] init];
     }
@@ -22,29 +23,55 @@ static NSMutableDictionary* _data = nil;
 }
 
 + (void) save {
-    [[self getData] writeToFile:[self savePath] atomically:YES];
+    [[Scenario getData] writeToFile:[self savePath] atomically:YES];
 }
 
 - (NSDictionary*) dict {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
     [dict setObject:self.code forKey:@"code"];
     [dict setObject:self.name forKey:@"name"];
+    
+    NSMutableArray *sceneDicts = [NSMutableArray arrayWithCapacity:[self.scenes count]];
+    NSEnumerator *e = [self.scenes objectEnumerator];
+    Scene *scene;
+    while (scene = [e nextObject]) {
+        [sceneDicts addObject:[scene dict]];
+    }
+    [dict setObject:[NSArray arrayWithArray:sceneDicts] forKey:@"scenes"];
     return [NSDictionary dictionaryWithDictionary:dict];
 }
 
 @end
 
 @implementation Scenario
-@synthesize code, name;
+@synthesize code, name, scenes;
 
 - (void)save {
-    [[Scenario getData] setObject:[self dict] forKey:self.code];
+    NSMutableDictionary *data = [Scenario getData];
+    [data setObject:[self dict] forKey:self.code];
     [Scenario save];
 }
 
 + (NSString*) savePath {
     NSString * bundlePath = [[NSBundle mainBundle] bundlePath];
     return [bundlePath stringByAppendingPathComponent:@"scenario.plist"];
+}
+
++ (Scenario*) fromDict:(NSDictionary*)d {
+    Scenario *s = [[[Scenario alloc] init] autorelease];
+    s.code = [NSString stringWithFormat:@"%@", [d objectForKey:@"code"]];
+    s.name = [NSString stringWithFormat:@"%@", [d objectForKey:@"name"]];
+    NSArray *sceneDicts = [d objectForKey:@"scenes"];
+    if (nil != sceneDicts) {
+        NSMutableArray *scenes = [NSMutableArray arrayWithCapacity:[sceneDicts count]];
+        NSDictionary *sceneDict;
+        NSEnumerator *e = [sceneDicts objectEnumerator];
+        while (sceneDict = [e nextObject]) {
+            [scenes addObject:[Scene fromDict:sceneDict]];
+        }
+        s.scenes = [NSArray arrayWithArray:scenes];
+    }
+    return s;
 }
 
 + (NSArray*) getAll {
@@ -54,9 +81,7 @@ static NSMutableDictionary* _data = nil;
     NSString *key;
     while (key = [enumerator nextObject]) {
         NSDictionary *d = [data objectForKey:key];
-        Scenario *s = [[[Scenario alloc] init] autorelease];
-        s.code = [d objectForKey:@"code"];
-        s.name = [d objectForKey:@"name"];
+        Scenario *s = [Scenario fromDict:d];
         [result addObject:s];
     }
     return [NSArray arrayWithArray:result];
