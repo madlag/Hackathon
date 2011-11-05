@@ -25,6 +25,19 @@
   #ViewContainer {
   position: absolute;
   }
+
+    #Parameters {
+    overflow:auto;
+    position: absolute;
+    height: 100%;
+    right: 0px;
+    top: 0px;
+    }
+
+    #Parameters div {
+    height: 20px;
+    }
+
 </style>
 
 <title>HackerDays</title>
@@ -32,14 +45,18 @@
 <script type="text/javascript" src="js/osg-debug.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
 <script type="text/javascript" src="js/flip.js"></script>
+<script type="text/javascript" src="js/plane.js"></script>
 
 </head>
 
 <body>
 
+  <div id="loading"> </div>
   <div id="ViewContainer">
-    <div id="loading"> </div>
-  <canvas id="3DView"></canvas>
+    <canvas id="3DView"></canvas>
+  </div>
+  <div id="Parameters">
+    <button id="ClearStorage" name="ClearStorage" onclick="if (window.localStorage) { window.localStorage.clear();}">Reset Default Value</button>
   </div>
 
 </body>

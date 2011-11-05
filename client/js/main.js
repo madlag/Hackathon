@@ -37,8 +37,8 @@ var main = function() {
         viewer = new osgViewer.Viewer(canvas, {antialias : true });
         viewer.init();
         Scene = new osg.Node();
-        //Scene.addChild(createScene());
-        createScene();
+        createScene(Scene);
+        //createScene();
         viewer.getCamera().setClearColor([0.0, 0.0, 0.0, 0.0]);
         viewer.setSceneData(Scene);
         viewer.setupManipulator();
@@ -262,14 +262,13 @@ var getImage = function() {
 
 
 
-function createScene()
+function createScene(scene)
 {
+    scene.addChild(createPlane());
     for (var i = 0, l = 50; i < l; i++) {
         if (!getImage())
             break;
     }
-    //return osg.createTexturedBoxGeometry(0,0,0, 20, 20, 20);
-    //return getModel();
 }
 
 
