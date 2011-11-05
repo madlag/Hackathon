@@ -22,6 +22,8 @@
         ScenarioViewController *scenarioViewController = [[[ScenarioViewController alloc] initWithNibName:@"ScenarioViewController" bundle:nil] autorelease];
         self.navigationController = [[[UINavigationController alloc] initWithRootViewController:scenarioViewController] autorelease];
         self.window.rootViewController = self.navigationController;
+        
+        
     } else {
     }
     [self.window makeKeyAndVisible];

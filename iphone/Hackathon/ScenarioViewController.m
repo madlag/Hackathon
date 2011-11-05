@@ -7,6 +7,7 @@
 //
 
 #import "ScenarioViewController.h"
+#import "Scenario.h"
 
 @implementation ScenarioViewController
 
@@ -16,6 +17,7 @@
     if (self) {
         // Custom initialization
     }
+    
     return self;
 }
 
