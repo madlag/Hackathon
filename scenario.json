@@ -1,0 +1,20 @@
+{
+  code: 123456,
+  name: "hello world",
+  scenes: [
+    {
+      id: 8275,
+      name: "Photo principale",
+      description: "Prends une photo de ton cul",
+      numPhotos: 1,
+      orientation: "portrait"
+    },
+    {
+      id: 8276,
+      name: "Photo secondaire",
+      description: "Prends 2 photos de celui de ta copine",
+      numPhotos: 2,
+      orientation: "landscape"
+    },
+  ],
+}
