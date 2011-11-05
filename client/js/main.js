@@ -110,13 +110,22 @@ var getQuadShader = function() {
             "attribute vec3 Normal;",
             "attribute vec2 TexCoord0;",
             "uniform mat4 ModelViewMatrix;",
+            "uniform mat4 NormalMatrix;",
             "uniform mat4 ProjectionMatrix;",
-            "uniform mat4 CameraInverseMatrix;",
 
             "varying vec2 FragTexCoord0;",
+            "varying float shade;",
+
+            "vec3 computeEyeDirection() {",
+            "return vec3(ModelViewMatrix * vec4(Vertex,1.0));",
+            "}",
+
             "void main(void) {",
             "gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(Vertex,1.0);",
-
+            "vec3 normal = mat3(NormalMatrix) * normalize(Normal);",
+            "vec3 eye = normalize(-computeEyeDirection());",
+            "shade = max(dot(normal,eye), 0.0);",
+            "//shade = 1.0;",
             "FragTexCoord0 = TexCoord0;",
             "}",
             ""
@@ -130,12 +139,13 @@ var getQuadShader = function() {
             "uniform float fade;",
             "uniform sampler2D Texture0;",
             "varying vec2 FragTexCoord0;",
+            "varying float shade;",
 
             "void main(void) {",
             "vec4 color = texture2D( Texture0, FragTexCoord0.xy);",
             "color.xyz *= fade;",
             "color.w = fade;",
-            "gl_FragColor = color;",
+            "gl_FragColor = color*shade;",
             "}",
             ""
         ].join('\n');
@@ -168,14 +178,19 @@ UpdatePhotoCallback.prototype = {
         }
         
         var trans = [];
-        var ratio = osgAnimation.EaseOutQuad(Math.min(dt, 1.0));
-        if (dt > 3.0) {
+        var maxt = 2.0;
+        var ratio = osgAnimation.EaseOutQuart(Math.min(dt*1.0/maxt, 1.0));
+        if (t > maxt) {
+            ratio += (t - maxt) * 0.01;
+        }
+
+        if (dt > 2.5) {
 
             var parent = node.getParents()[0];
             var m = node.getWorldMatrices()[0];
             var range = 400;
             var depth = -1000;
-            var effect = createWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 1.0, Width);
+            var effect = createWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
             parent.addChild(effect);
             node.setNodeMask(0x0);
             //node.effect.setNodeMask(~0x0);
@@ -257,7 +272,6 @@ Organizer.prototype = {
         var fade = osg.Uniform.createFloat1(0.0,'fade');
         q.getOrCreateStateSet().addUniform(fade);
         q.fade = fade;
-
 
         this._images.push(q);
         var texture = q.getChildren()[0].getStateSet().getTextureAttribute(0,'Texture');

@@ -120,7 +120,7 @@ TransitionUpdateCallback.prototype = {
             dz *= quot;
         }
         
-        var ddt = Math.max((t-node._startDissolve)/2.0,0.0);
+        var ddt = Math.max((t-node._startDissolve),0.0);
         var ratio = osgAnimation.EaseInQuad(Math.min(ddt, 1.0));
         ratio = Math.max(ratio, 0.0);
 
@@ -304,14 +304,14 @@ var createWindEffect = function(texture, target, matrix, time, width, initialSpe
             group.addChild(mtr);
             mtr.addUpdateCallback(cb);
             var t = time;
-            var t2 = (x*maxy + y)*0.01;
+            var t2 = (x*maxy + y)*0.005;
             mtr._lastUpdate = -1;
             mtr._startDissolve = t2;
             mtr._start = t;
             mtr._axis = [ Math.random(), Math.random(), Math.random()];
             mtr._initialSpeed = initialSpeed;
             mtr._rotation = [];
-            mtr.maxSpeed = 0.2 + Math.random() * 10.0;
+            mtr.maxSpeed = 0.4 + Math.random() * 10.0;
             osg.Matrix.copy(matrix, mtr._rotation);
             osg.Matrix.setTrans(mtr._rotation, 0,0,0);
 
