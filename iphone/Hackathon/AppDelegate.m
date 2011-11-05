@@ -8,7 +8,7 @@
 
 #import "AppDelegate.h"
 
-#import "ScenarioViewController.h"
+#import "ScenarioListViewController.h"
 @implementation AppDelegate
 
 @synthesize window = _window;
@@ -19,7 +19,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        ScenarioViewController *scenarioViewController = [[[ScenarioViewController alloc] initWithNibName:@"ScenarioViewController" bundle:nil] autorelease];
+        ScenarioListViewController *scenarioViewController = [[[ScenarioListViewController alloc] initWithNibName:@"ScenarioListViewController" bundle:nil] autorelease];
         self.navigationController = [[[UINavigationController alloc] initWithRootViewController:scenarioViewController] autorelease];
         self.window.rootViewController = self.navigationController;
         

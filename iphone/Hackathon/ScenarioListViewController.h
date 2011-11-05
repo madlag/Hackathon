@@ -1,5 +1,5 @@
 //
-//  ScenarioViewController.h
+//  ScenarioListViewController.h
 //  Hackathon
 //
 //  Created by Stephane JAIS on 11/5/11.
@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "CodeInputViewController.h"
 
-@interface ScenarioViewController : UITableViewController <CodeInputViewControllerDelegate> {
+@interface ScenarioListViewController : UITableViewController <CodeInputViewControllerDelegate> {
     NSArray *scenarii;
 }
 

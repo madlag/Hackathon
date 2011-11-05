@@ -1,14 +1,19 @@
 //
-//  ScenarioViewController.m
+//  ScenarioListViewController.m
 //  Hackathon
 //
 //  Created by Stephane JAIS on 11/5/11.
 //  Copyright (c) 2011 Cantina Software. All rights reserved.
 //
 
-#import "ScenarioViewController.h"
+#import "ScenarioListViewController.h"
 #import "Scenario.h"
-@implementation ScenarioViewController
+
+@interface ScenarioListViewController()
+-(void)addCode:(BOOL)showCancel;
+@end
+
+@implementation ScenarioListViewController
 @synthesize scenarii;
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -47,14 +52,7 @@
     
     // First time user: no scenario
     if (0 == [scenarii count]) {
-        CodeInputViewController *codeInput = [[CodeInputViewController alloc] initWithNibName:@"CodeInputViewController" bundle:nil];
-        [codeInput setShowCancel:NO];
-        codeInput.delegate = self;
-        UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:codeInput];
-        [self presentModalViewController:nav animated:NO];
-        [codeInput release];
-        [nav release];
-        
+        [self addCode:NO];
     }
     
     // Uncomment the following line to preserve selection between presentations.
@@ -183,6 +181,16 @@
 
 #pragma mark - Code Input
 
+-(void)addCode:(BOOL)showCancel {
+    CodeInputViewController *codeInput = [[CodeInputViewController alloc] initWithNibName:@"CodeInputViewController" bundle:nil];
+    [codeInput setShowCancel:showCancel];
+    codeInput.delegate = self;
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:codeInput];
+    [self presentModalViewController:nav animated:NO];
+    [codeInput release];
+    [nav release];
+}
+
 - (void)codeInputViewController:(CodeInputViewController *)c doneWithScenario:(Scenario *)s {
     
     [s save];
@@ -192,7 +200,7 @@
 }
 
 - (void)onAdd:(id)sender {
-    
+    [self addCode:YES];
 }
 
 @end
