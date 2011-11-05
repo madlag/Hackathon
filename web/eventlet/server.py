@@ -8,6 +8,7 @@ import collections
 import json
 import redis
 import eventlet.pools
+import thumb
 
 ADRESS="192.168.0.75"
 STORAGE="/tmp/storage/"
@@ -198,6 +199,9 @@ class App:
                 break
             f.write(s)
         f.close()
+        
+        image, exif = thumb.ThumbCreator.run(path)
+        image.save(path)
         
         start_response('200 OK', [('content-type', 'application/json')])
         url = self.uploadURL(uploadID)
