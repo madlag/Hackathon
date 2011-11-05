@@ -1,4 +1,4 @@
-// osg-debug-0.0.7.js commit 43bb9ad7c004ced8eaabf6ece097e7ea0606e38a - http://github.com/cedricpinson/osgjs
+// osg-debug-0.0.7.js commit 5f1013cd4c1c562d4f938c788d13d6e7e9b84101 - http://github.com/cedricpinson/osgjs
 /** -*- compile-command: "jslint-cli osg.js" -*- */
 var osg = {};
 
@@ -1534,6 +1534,9 @@ osg.Shader = function(type, text) {
     this.type = type;
     this.setText(text);
 };
+
+osg.Shader.VERTEX_SHADER = 0x8B31;
+osg.Shader.FRAGMENT_SHADER = 0x8B30;
 
 /** @lends osg.Shader.prototype */
 osg.Shader.prototype = {

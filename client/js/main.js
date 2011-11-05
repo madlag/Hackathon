@@ -43,9 +43,14 @@ var main = function() {
         var scene = world.getScene();
 
         viewer.getCamera().setClearColor([0.0, 0.0, 0.0, 0.0]);
-        viewer.setSceneData(scene);
         viewer.setupManipulator();
         viewer.getManipulator().computeHomePosition();
+        viewer.getManipulator().setTarget([0,0,0]);
+        viewer.getManipulator().setDistance(300);
+        viewer.getManipulator().getInverseMatrix = function() {
+            return osg.Matrix.makeLookAt([0,-600,0], [0,0,0], [0,0,1], []);
+        };
+        viewer.setSceneData(scene);
 
         viewer.run();
         Viewer = viewer;
@@ -94,6 +99,99 @@ var cropImage = function(w,h, aspect, wrequire) {
     return [ [ustart, vstart], [uend, vend] ];
 };
 
+var getQuadShader = function() {
+    if (getQuadShader.shader === undefined) {
+        var vertexshader = [
+            "",
+            "#ifdef GL_ES",
+            "precision highp float;",
+            "#endif",
+            "attribute vec3 Vertex;",
+            "attribute vec3 Normal;",
+            "attribute vec2 TexCoord0;",
+            "uniform mat4 ModelViewMatrix;",
+            "uniform mat4 ProjectionMatrix;",
+            "uniform mat4 CameraInverseMatrix;",
+
+            "varying vec2 FragTexCoord0;",
+            "void main(void) {",
+            "gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(Vertex,1.0);",
+
+            "FragTexCoord0 = TexCoord0;",
+            "}",
+            ""
+        ].join('\n');
+
+        var fragmentshader = [
+            "",
+            "#ifdef GL_ES",
+            "precision highp float;",
+            "#endif",
+            "uniform float fade;",
+            "uniform sampler2D Texture0;",
+            "varying vec2 FragTexCoord0;",
+
+            "void main(void) {",
+            "vec4 color = texture2D( Texture0, FragTexCoord0.xy);",
+            "color.xyz *= fade;",
+            "color.w = fade;",
+            "gl_FragColor = color;",
+            "}",
+            ""
+        ].join('\n');
+
+        var program = new osg.Program(
+            new osg.Shader(osg.Shader.VERTEX_SHADER, vertexshader),
+            new osg.Shader(osg.Shader.FRAGMENT_SHADER, fragmentshader));
+        getQuadShader.shader = program;
+    }
+
+    return getQuadShader.shader;
+};
+
+
+var UpdatePhotoCallback = function() {};
+UpdatePhotoCallback.prototype = {
+    update: function(node, nv) {
+        var t = nv.getFrameStamp().getSimulationTime();
+
+        if (node.lastUpdate === false) {
+            return true;
+        } else if (node.lastUpdate < 0) {
+            node.lastUpdate = t;
+            node.startTime += t;
+        }
+
+        var dt = t - node.startTime;
+        if (dt < 0) {
+            return true;
+        }
+        
+        var trans = [];
+        var ratio = osgAnimation.EaseOutQuad(Math.min(dt, 1.0));
+        if (dt > 3.0) {
+
+            var parent = node.getParents()[0];
+            var m = node.getWorldMatrices()[0];
+            var range = 400;
+            var depth = -1000;
+            var effect = createWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 1.0, Width);
+            parent.addChild(effect);
+            node.setNodeMask(0x0);
+            //node.effect.setNodeMask(~0x0);
+            return true;
+        }
+        node.fade.get()[0] = ratio;
+        node.fade.dirty();
+
+        osg.Matrix.getTrans(node.getMatrix(), trans);
+        var range = 3000;
+        trans[1] = range + (-ratio) * range;
+        osg.Matrix.setTrans(node.getMatrix(), trans[0], trans[1], trans[2]);
+        return true;
+    }
+};
+
 var testDissolve = false;
 var Organizer = function(x, y) {
     this._x = x;
@@ -105,6 +203,30 @@ var Organizer = function(x, y) {
     this._full = 0;
     this._currentSelected = undefined;
     this._root = new osg.MatrixTransform();
+    this._root.getOrCreateStateSet().setAttributeAndMode(getQuadShader());
+
+    var w = Width;
+    var h = Width/Ratio;
+    var space = 10;
+
+    this._layouts = [
+        [ [ -w/2 - space/2, h/2+space/2],
+          [ w/2 + space/2, h/2+space/2],
+          [ 0, -h/2 -space/2]
+        ],
+
+        [ [ -w/2 - space/2, 0],
+          [ w/2 + space/2, 0]
+        ],
+
+        [ [ -w/2 - space/2, h/2+space/2],
+          [ w/2 + space/2, h/2+space/2],
+          [ -w/2 - space/2, -h/2 -space/2],
+          [ w/2 + space/2, -h/2 -space/2]
+        ]
+    ];
+
+    this._layout = this.getLayout();
 };
 
 Organizer.prototype = {
@@ -119,90 +241,55 @@ Organizer.prototype = {
         newone.select();
     },
 
+    getLayout: function() {
+        var idx = Math.floor(Math.random() * (this._layouts.length)) % this._layouts.length;
+        return this._layouts[idx];
+    },
+
     push: function(q) {
 
         if (this._full) {
             return false;
         }
 
-        var w = q.width;
-        var h = q.height;
+        q.addUpdateCallback(new UpdatePhotoCallback());
+        q.lastUpdate = false;
+        var fade = osg.Uniform.createFloat1(0.0,'fade');
+        q.getOrCreateStateSet().addUniform(fade);
+        q.fade = fade;
+
 
         this._images.push(q);
         var texture = q.getChildren()[0].getStateSet().getTextureAttribute(0,'Texture');
+        q.texture = texture;
         this._textures.push(texture);
+        var w = Width;
+        var h = Width/Ratio;
 
-        if (this._currentSide === 0) {
-            q.position = [this._currentPos, this._y-1];
-            this._currentPos++;
-            if (!testDissolve) {
-                this.createMain();
-                testDissolve = true;
-            }
-            
-            if (this._currentPos >= this._x) {
-                this._currentSide++;
-                this._currentPos = 2;
-            }
-        } else if (this._currentSide === 1) {
-            q.position = [this._x-1, this._y - this._currentPos];
-            this._images.push(q);
-            this._currentPos ++;
+        var material = new osg.Material();
+        q.material = material;
+        q.getOrCreateStateSet().setAttributeAndMode(material);
+        q.getOrCreateStateSet().setAttributeAndMode(new osg.BlendFunc('ONE', 'ONE_MINUS_SRC_ALPHA'));
 
-            if (this._currentPos > this._y) {
-                this._currentSide++;
-                this._currentPos = 2;
-            }
-        } else if (this._currentSide === 2) {
-            q.position = [this._x - this._currentPos, 0];
-            this._images.push(q);
-            this._currentPos++;
+        var layout = this._layout;
 
-            if (this._currentPos > this._x) {
-                this._currentSide++;
-                this._currentPos = 1;
-            }
-        } else if (this._currentSide === 3) {
-            q.position = [0, this._currentPos];
-            this._images.push(q);
-            this._currentPos++;
-
-            if (this._currentPos >= this._y-1) {
-                this._currentSide = 0;
-                this._currentPos = 0;
-                this._full = true;
-                //this.createMain();
-            }
+        q.position = layout[this._currentPos];
+        this._currentPos++;
+        if (this._currentPos >= layout.length) {
+            this._full = true;
+            this.start();
         }
 
         this._root.addChild(this._images[this._images.length-1]);
         return true;
     },
-    createMain: function() {
-        var scale = 9;
-        var node = new osg.MatrixTransform();
-        osg.Matrix.makeTranslate(0.25*Width,
-                                 depth,
-                                 0.25*Width/Ratio,
-                                 node.getMatrix());
 
-        osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeScale(scale,
-                                                                  scale,
-                                                                  scale,
-                                                                  []));
-        
-        var t0 = this._textures[0];
-        var t1 = this._textures[1];
-
-        //node.addChild(createEffect(t0, t1, Width));
-        this._root.addChild(createWindEffect(t0, [-1000, 0,0], node.getMatrix(), 1.0, Width));
-
-
-        this._root.addChild(node);
-        this._main = node;
-    },
-    setMainNode: function(main) { this._main = main; },
-    getMainNode: function() { return this._main; }
+    start: function() {
+        for (var i = 0, l = this._images.length; i < l; i++) {
+            this._images[i].lastUpdate = -1;
+            this._images[i].startTime = Math.random();
+        }
+    }
 
 };
 
@@ -277,11 +364,24 @@ var getDummyImage = function() {
 };
 
 
+
 var World = function() {
     this._groups = [];
     this._currentGroup;
     this._scene = new osg.Node();
     this.createGroup();
+
+    var fakeEventImage = function(event) {
+        if (event.keyCode === 32) {
+            WorldGallery.addImage(getFakeImageURL());
+            WorldGallery.addImage(getFakeImageURL());
+            WorldGallery.addImage(getFakeImageURL());
+            WorldGallery.addImage(getFakeImageURL());
+        }
+    };
+
+    window.addEventListener("keyup", fakeEventImage, false);
+
 };
 
 World.prototype = {
@@ -301,15 +401,19 @@ World.prototype = {
     },
 
     createQuadFromImage: function(img) {
+        if (this.isFull()) {
+            return;
+        }
         var node = new osg.MatrixTransform();
         var q = createQuad(img);
         node.addChild(q);
         this.push(node);
         depth++;
-        osg.Matrix.makeTranslate((node.position[0] - X/2 - 0.5)*Width,
-                                 depth,
-                                 (node.position[1] - Y/2 - 0.5)*Width/Ratio,
+        osg.Matrix.makeTranslate((node.position[0]),
+                                 depth*20,
+                                 (node.position[1]),
                                  node.getMatrix());
+
         var rand = (-0.5 + Math.random()) * 0.0;
         osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeRotate(rand*0.1*Math.PI,0,1,0, []));
     },
@@ -326,64 +430,6 @@ World.prototype = {
 
 
 
-var getImage = function() {
-    var node = new osg.MatrixTransform();
-
-    if (organize.push(node)) {
-        var q = createQuad(getDummyImage());
-        node.addChild(q);
-
-        depth++;
-        osg.Matrix.makeTranslate((node.position[0] - X/2 - 0.5)*Width,
-                                 depth,
-                                 (node.position[1] - Y/2 - 0.5)*Width/Ratio,
-                                 node.getMatrix());
-        var rand = (-0.5 + Math.random()) * 0.0;
-        osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeRotate(rand*0.1*Math.PI,0,1,0, []));
-        return true;
-    } else {
-
-        var scale = 9;
-        osg.Matrix.makeTranslate(0.25*Width,
-                                 depth,
-                                 0.25*Width/Ratio,
-                                 node.getMatrix());
-
-        osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeScale(scale,
-                                                                  1.0,
-                                                                  scale,
-                                                                  []));
-        
-        var t0 = new osg.Texture();
-        t0.setImage(getDummyImage());
-
-        var t1 = new osg.Texture();
-        t1.setImage(getDummyImage());
-
-        node.addChild(createEffect(t0, t1, Width));
-
-        organize.setMainNode(node);
-        Scene.addChild(node);
-        return false;
-    }
-};
-
-
-
-function createScene(scene)
-{
-    scene.addChild(createPlane());
-    for (var i = 0, l = 50; i < l; i++) {
-        if (!getImage())
-            break;
-    }
-}
-
-
-var fakeEventImage = function(event) {
-    WorldGallery.addImage(getFakeImageURL());
-};
 
 window.addEventListener("load", main ,true);
-window.addEventListener("keyup", fakeEventImage, false);
 
