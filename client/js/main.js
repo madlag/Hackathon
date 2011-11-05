@@ -177,7 +177,7 @@ var createQuad = function(img) {
     var t = new osg.Texture();
     t.setImage(img);
     q.getOrCreateStateSet().setTextureAttributeAndMode(0, t);
-    q.getOrCreateStateSet().setAttributeAndMode(new osg.CullFace('DISABLE'));
+    //q.getOrCreateStateSet().setAttributeAndMode(new osg.CullFace('DISABLE'));
     q.width = w;
     q.height = h;
     
