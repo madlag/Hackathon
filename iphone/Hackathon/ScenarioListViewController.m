@@ -7,6 +7,8 @@
 //
 
 #import "ScenarioListViewController.h"
+#import "ScenarioViewController.h"
+#import "StepViewController.h"
 #import "Scenario.h"
 
 @interface ScenarioListViewController()
@@ -169,14 +171,12 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     [detailViewController release];
-     */
+     /*ScenarioViewController *scenarioVC = [[ScenarioViewController alloc] initWithNibName:@"ScenarioViewController" bundle:nil];
+     [self.navigationController pushViewController:scenarioVC animated:YES];
+     [scenarioVC release];*/
+    StepViewController *stepVC = [[StepViewController alloc] initWithNibName:@"StepViewController" bundle:nil];
+    [self.navigationController pushViewController:stepVC animated:YES];
+    [stepVC release];
 }
 
 #pragma mark - Code Input
@@ -193,10 +193,10 @@
 
 - (void)codeInputViewController:(CodeInputViewController *)c doneWithScenario:(Scenario *)s {
     
-    [s save];
-    self.scenarii = [Scenario getAll];
-    [self.tableView reloadData];
-//    [self 
+    //[s save];
+    //self.scenarii = [Scenario getAll];
+    //[self.tableView reloadData];
+    
 }
 
 - (void)onAdd:(id)sender {

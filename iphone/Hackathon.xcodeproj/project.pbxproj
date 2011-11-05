@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		39B7D2E51465707800324A05 /* ScenarioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39B7D2E31465707800324A05 /* ScenarioViewController.m */; };
+		39B7D2E61465707800324A05 /* ScenarioViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 39B7D2E41465707800324A05 /* ScenarioViewController.xib */; };
+		39B7D2F11465781700324A05 /* StepViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39B7D2EF1465781700324A05 /* StepViewController.m */; };
+		39B7D2F21465781700324A05 /* StepViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 39B7D2F01465781700324A05 /* StepViewController.xib */; };
+		39C525A2146599A700467BEC /* UIImageExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 39C525A1146599A700467BEC /* UIImageExtensions.m */; };
 		994F25481464AEE600A2809E /* ScenarioListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 994F25461464AEE600A2809E /* ScenarioListViewController.m */; };
 		994F25491464AEE600A2809E /* ScenarioListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 994F25471464AEE600A2809E /* ScenarioListViewController.xib */; };
 		994F254D1464AFF700A2809E /* Scenario.m in Sources */ = {isa = PBXBuildFile; fileRef = 994F254C1464AFF700A2809E /* Scenario.m */; };
@@ -60,7 +65,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		994F25451464AEE600A2809E /* ScenarioListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ScenarioListViewController.h; sourceTree = "<group>"; };
+		39B7D2E21465707800324A05 /* ScenarioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenarioViewController.h; sourceTree = "<group>"; };
+		39B7D2E31465707800324A05 /* ScenarioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScenarioViewController.m; sourceTree = "<group>"; };
+		39B7D2E41465707800324A05 /* ScenarioViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ScenarioViewController.xib; sourceTree = "<group>"; };
+		39B7D2EE1465781700324A05 /* StepViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StepViewController.h; sourceTree = "<group>"; };
+		39B7D2EF1465781700324A05 /* StepViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StepViewController.m; sourceTree = "<group>"; };
+		39B7D2F01465781700324A05 /* StepViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StepViewController.xib; sourceTree = "<group>"; };
+		39C525A0146599A700467BEC /* UIImageExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageExtensions.h; sourceTree = "<group>"; };
+		39C525A1146599A700467BEC /* UIImageExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageExtensions.m; sourceTree = "<group>"; };
+		994F25451464AEE600A2809E /* ScenarioListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenarioListViewController.h; sourceTree = "<group>"; };
 		994F25461464AEE600A2809E /* ScenarioListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScenarioListViewController.m; sourceTree = "<group>"; };
 		994F25471464AEE600A2809E /* ScenarioListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ScenarioListViewController.xib; sourceTree = "<group>"; };
 		994F254B1464AFF700A2809E /* Scenario.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scenario.h; sourceTree = "<group>"; };
@@ -223,6 +236,14 @@
 				994F25451464AEE600A2809E /* ScenarioListViewController.h */,
 				994F25461464AEE600A2809E /* ScenarioListViewController.m */,
 				994F25471464AEE600A2809E /* ScenarioListViewController.xib */,
+				39B7D2E21465707800324A05 /* ScenarioViewController.h */,
+				39B7D2E31465707800324A05 /* ScenarioViewController.m */,
+				39B7D2E41465707800324A05 /* ScenarioViewController.xib */,
+				39B7D2EE1465781700324A05 /* StepViewController.h */,
+				39B7D2EF1465781700324A05 /* StepViewController.m */,
+				39B7D2F01465781700324A05 /* StepViewController.xib */,
+				39C525A0146599A700467BEC /* UIImageExtensions.h */,
+				39C525A1146599A700467BEC /* UIImageExtensions.m */,
 				997A2EA914648865003C38BD /* Supporting Files */,
 				994F254B1464AFF700A2809E /* Scenario.h */,
 				994F254C1464AFF700A2809E /* Scenario.m */,
@@ -427,6 +448,8 @@
 				997A2EAD14648865003C38BD /* InfoPlist.strings in Resources */,
 				994F25491464AEE600A2809E /* ScenarioListViewController.xib in Resources */,
 				999783C714656A83004790E3 /* CodeInputViewController.xib in Resources */,
+				39B7D2E61465707800324A05 /* ScenarioViewController.xib in Resources */,
+				39B7D2F21465781700324A05 /* StepViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -477,6 +500,9 @@
 				999783B7146569D8004790E3 /* SBJsonWriter.m in Sources */,
 				999783C214656A70004790E3 /* Scene.m in Sources */,
 				999783C614656A83004790E3 /* CodeInputViewController.m in Sources */,
+				39B7D2E51465707800324A05 /* ScenarioViewController.m in Sources */,
+				39B7D2F11465781700324A05 /* StepViewController.m in Sources */,
+				39C525A2146599A700467BEC /* UIImageExtensions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -544,10 +570,14 @@
 		997A2EC014648865003C38BD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hackathon/Hackathon-Prefix.pch";
 				INFOPLIST_FILE = "Hackathon/Hackathon-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -555,10 +585,14 @@
 		997A2EC114648865003C38BD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hackathon/Hackathon-Prefix.pch";
 				INFOPLIST_FILE = "Hackathon/Hackathon-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

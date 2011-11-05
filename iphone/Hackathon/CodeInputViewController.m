@@ -8,6 +8,12 @@
 
 #import "CodeInputViewController.h"
 #import "SBJson.h"
+#import "UIImageExtensions.h"
+
+@interface CodeInputViewController()
+-(void)onPictureUploaded:(ASIHTTPRequest *)r;
+-(void)onPushDone:(ASIHTTPRequest *)r;
+@end
 
 @implementation CodeInputViewController
 @synthesize saveButton, cancelButton, textField, spinner, delegate, request;
@@ -89,11 +95,23 @@
 }
 
 - (void)onSave:(id)sender {
-    NSString *code = [self.textField text];  
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost/~ataugeron/scenario.php?code=%@", 
-                                       [code stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-
+    channelId = [[self.textField text] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];  
+    NSMutableDictionary *requestDict = [NSMutableDictionary dictionaryWithCapacity:2];
+    [requestDict setObject:@"producer_connect" forKey:@"type"];
+    
+    NSMutableDictionary *value = [NSMutableDictionary dictionaryWithCapacity:2];
+    [value setObject:channelId forKey:@"channelId"];
+    [value setObject:@"myUniqueId" forKey:@"producerId"];
+    
+    [requestDict setObject:value forKey:@"value"];
+    
+    SBJsonWriter *jsonWriter = [[SBJsonWriter alloc] init];
+    NSData *requestData = [jsonWriter dataWithObject:requestDict];
+    
+    NSURL *url = [NSURL URLWithString:@"http://192.168.0.75:7000/iosclient/"];
     self.request = [ASIHTTPRequest requestWithURL:url];
+    [self.request appendPostData:requestData];
+    [self.request setRequestMethod:@"POST"];
     [self.request setDelegate:self];
     [self.request startAsynchronous]; 
 
@@ -111,7 +129,7 @@
         [self.navigationItem setLeftBarButtonItem:nil];
 
     SBJsonParser *parser = [[[SBJsonParser alloc] init] autorelease];
-    
+    NSLog(@"Response: %@", [r responseString]);
     NSError *error = nil;
     NSDictionary  *d = [parser objectWithString:[r responseString] error:&error];
     self.request = nil;
@@ -120,7 +138,18 @@
         if (nil != self.delegate)
             [self.delegate codeInputViewController:self doneWithScenario:s];
         [s release];
-        [self dismissModalViewControllerAnimated:YES];
+        //[self dismissModalViewControllerAnimated:YES];
+        
+        
+        // TEMPORARY
+        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+        imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        imagePicker.delegate = self;
+        [self presentModalViewController:imagePicker animated:YES];
+        [imagePicker release];
+        // TEMPORARY
+        
+        
     } else {
         NSLog(@"Could not parse JSON: %@", [error localizedDescription]);
     }
@@ -139,6 +168,52 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     return self.request == nil;
+}
+
+
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    NSURL *url = [NSURL URLWithString:@"http://st2.stupeflix.com/upload/"];
+    ASIHTTPRequest *uploadRequest = [ASIHTTPRequest requestWithURL:url];
+    [uploadRequest setDelegate:self];
+    [uploadRequest setDidFinishSelector:@selector(onPictureUploaded:)];
+    [uploadRequest setRequestMethod:@"POST"];
+    [uploadRequest addRequestHeader:@"Content-Type" value:@"image/jpeg"];
+    UIImage *picture = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
+    CGSize targetSize = CGSizeMake(320, 480);
+    UIImage *scaledPicture = [picture imageByScalingProportionallyToSize:targetSize];
+    [uploadRequest appendPostData:UIImageJPEGRepresentation(scaledPicture, 1.0)];
+    [uploadRequest startAsynchronous];
+}
+
+-(void)onPictureUploaded:(ASIHTTPRequest *)r {
+    SBJsonParser *parser = [[SBJsonParser alloc] init];
+    NSDictionary *pictureDict = [parser objectWithString:[r responseString]];
+    
+    NSMutableDictionary *requestDict = [NSMutableDictionary dictionaryWithCapacity:2];
+    [requestDict setObject:@"producer_push" forKey:@"type"];
+    
+    NSMutableDictionary *value = [NSMutableDictionary dictionaryWithCapacity:3];
+    [value setObject:channelId forKey:@"channelId"];
+    [value setObject:@"myUniqueId" forKey:@"producerId"];
+    [value setObject:[pictureDict objectForKey:@"file_url"] forKey:@"url"];
+    
+    [requestDict setObject:value forKey:@"value"];
+    
+    SBJsonWriter *jsonWriter = [[SBJsonWriter alloc] init];
+    NSData *requestData = [jsonWriter dataWithObject:requestDict];
+    
+    NSURL *url = [NSURL URLWithString:@"http://192.168.0.75:7000/iosclient/"];
+    ASIHTTPRequest *pushRequest = [ASIHTTPRequest requestWithURL:url];
+    [pushRequest appendPostData:requestData];
+    [pushRequest setRequestMethod:@"POST"];
+    [pushRequest setDelegate:self];
+    [pushRequest setDidFinishSelector:@selector(onPushDone:)];
+    [pushRequest startAsynchronous]; 
+}
+
+-(void)onPushDone:(ASIHTTPRequest *)r {
+    NSLog(@"%@", [r responseString]);
 }
 
 @end

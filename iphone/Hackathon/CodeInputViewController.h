@@ -11,7 +11,7 @@
 #import "Scenario.h"
 
 @protocol CodeInputViewControllerDelegate;
-@interface CodeInputViewController : UIViewController <ASIHTTPRequestDelegate, UITextFieldDelegate> {
+@interface CodeInputViewController : UIViewController <ASIHTTPRequestDelegate, UITextFieldDelegate, UIImagePickerControllerDelegate> {
     UIBarButtonItem *cancelButton;
     UIBarButtonItem *saveButton;
     UITextField *textField;
@@ -19,6 +19,7 @@
     UIView *spinner;
     id<CodeInputViewControllerDelegate> delegate;
     ASIHTTPRequest *request;
+    NSString *channelId;
 }
 
 @property (nonatomic, retain) IBOutlet UIBarButtonItem *cancelButton;
