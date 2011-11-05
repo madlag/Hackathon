@@ -4,45 +4,57 @@ import eventlet
 from eventlet import wsgi
 from eventlet import websocket
 import urlparse
-
+import collections
 PORT = 7000
 
-channel_id
 
-participants = set()
+participants = collections.defaultdict(list)
 
 @websocket.WebSocketWSGI
 def handle(ws):
-#    print dir(ws)
-    print ws.environ.keys()
-    print urlparse.parse_qs(ws.environ.get("QUERY_STRING", ""))
-    print dir(ws.environ["eventlet.input"])
-    participants.add(ws)
-#    for p in participants:
-#        p.send("coucou")
+    queryParams = urlparse.parse_qs(ws.environ.get("QUERY_STRING", ""))
+    channelID = queryParams.get("channelID")
+    if len(channelID) == 0:
+        return
+    channelID = channelID[0]
+        
+    participants[channelID] += [ws]
+
+    for p in participants[channelID]:
+        p.send("coucou")
     
     try:
         while True:
             m = ws.wait()
             if m is None:
                 break
-            for p in participants:
+            for p in participants[channelID]:
                 p.send(m)
     finally:
-        participants.remove(ws)
+        participants[channelID].remove(ws)
+        if len(participants[channelID]) == 0:
+            del participants[channelID] 
                   
 def dispatch(environ, start_response):
     """Resolves to the web page or the websocket depending on the path."""
 #    print environ
-    print environ["PATH_INFO"], start_response
-    if environ['PATH_INFO'] == '/chat':
-        ret = handle(environ, start_response)
-        print ret
-        return ret
+    path = environ['PATH_INFO'][1:]
+    if path.startswith('webclient/'):
+        return handle(environ, start_response)
+    elif path.startswith("iosclient/"):
+        print path.startwith
     else:
+        if path == "favicon.ico":
+            ret = ""
+        else:            
+            if path == "":
+                path = "websocket_chat.html"
+            html_path = os.path.join(os.path.dirname(__file__), path)
+            ret = open(html_path).read()
+
         start_response('200 OK', [('content-type', 'text/html')])
-        html_path = os.path.join(os.path.dirname(__file__), 'websocket_chat.html')
-        return [open(html_path).read() % {'port': PORT}]
+
+        return [ret % {'port': PORT}]
         
 if __name__ == "__main__":
     # run an example app from the command line            

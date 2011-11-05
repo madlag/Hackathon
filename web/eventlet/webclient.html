@@ -13,10 +13,25 @@
 <input type="submit" />
 </form>
 
+<script src="socket.io.js"></script>
 <script>
+  /*
+  var socket = io.connect('ws://localhost');
+  socket.emit('channel_id', { id: '123' });
+
+  socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+  });
+*/
+</script>
+
+
+<script>
+
 window.onload = function() {
   var data = {};
-  var s = new WebSocket("ws://127.0.0.1:7000/chat?a=1");
+  var s = new WebSocket("ws://127.0.0.1:%(port)s/webclient/?channelID=124");
   s.onopen = function() {
     s.send('New participant joined');
   };
@@ -29,7 +44,11 @@ window.onload = function() {
     s.send(line);
     return false;
   });
+
+  s.send("coucou");
+
 };
+
 </script>
 
 </body>
