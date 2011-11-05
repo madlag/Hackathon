@@ -36,8 +36,8 @@ TransitionUpdateCallback.prototype = {
         current[1] += dy * dt * ratio;
         current[2] += dz * dt * ratio;
 
-        //osg.Matrix.makeRotate(ratio * Math.PI, node._axis[0], node._axis[1], node._axis[2] ,m);
-        osg.Matrix.makeRotate(ratio * Math.PI, 0, 0, 1.0 ,m);
+        osg.Matrix.makeRotate(ratio * Math.PI, node._axis[0], node._axis[1], node._axis[2] ,m);
+        //osg.Matrix.makeRotate(ratio * Math.PI, 0, 0, 1.0 ,m);
         osg.Matrix.setTrans(m, current[0], current[1], current[2]);
         return true;
     }
@@ -102,10 +102,10 @@ var createTexturedBox = function(centerx, centery, centerz,
     array1[4] = -1; array1[5] = -1;
     array1[6] = -1; array1[7] = -1;
 
-    array1[8] = l; array1[9] = t;
-    array1[10] = l; array1[11] = b;
-    array1[12] = r; array1[13] = b;
-    array1[14] = r; array1[15] = t;
+    array1[8] = r; array1[9] = t;
+    array1[10] = l; array1[11] = t;
+    array1[12] = l; array1[13] = b;
+    array1[14] = r; array1[15] = b;
 
 
     array1[16] = 0; array1[17] = 0;
@@ -233,10 +233,13 @@ var createEffect = function(texture0, texture1, width) {
             mtr.addChild(model);
             group.addChild(mtr);
             mtr.addUpdateCallback(cb);
-            var t = (x*maxy + y)*0.02;
+            //var t = (x*maxy + y)*0.02;
+            var t = osg.Vec3.length([-maxx*size[0]*0.5-rx ,0,rz - maxy*size[2]*0.5 ]);
+            t = t*0.008+0.2;
             mtr._lastUpdate = t;
             mtr._start = t;
-            mtr._axis = [ Math.random(), Math.random(), Math.random()];
+            mtr._axis = [ Math.random(), 0, Math.random()];
+            mtr._axis = [ 1.0, 0, 1.0];
             osg.Vec3.normalize(mtr._axis, mtr._axis);
         }
     }

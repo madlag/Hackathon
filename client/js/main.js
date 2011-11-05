@@ -221,12 +221,11 @@ var getDummyImage = function() {
 var getImage = function() {
     var node = new osg.MatrixTransform();
 
-    var q = createQuad(getDummyImage());
 
-    node.addChild(q);
-    node.width = q.width;
-    node.height = q.height;
     if (organize.push(node)) {
+        var q = createQuad(getDummyImage());
+        node.addChild(q);
+
         depth++;
         osg.Matrix.makeTranslate((node.position[0] - X/2 - 0.5)*Width,
                                  depth,
@@ -238,9 +237,9 @@ var getImage = function() {
     } else {
 
         var scale = 9;
-        osg.Matrix.makeTranslate(0.0*Width,
+        osg.Matrix.makeTranslate(0.25*Width,
                                  depth,
-                                 0.0*Width/Ratio,
+                                 0.25*Width/Ratio,
                                  node.getMatrix());
 
         osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeScale(scale,
