@@ -68,6 +68,29 @@ var addLoading = function() {
 };
 
 
+var cropImage = function(w,h, aspect, wrequire) {
+    var vstart = 0.0;
+    var vend = 1.0;
+    var ustart = 0.0;
+    var uend = 1.0;
+
+    var imgRatio = w/h;
+    if (imgRatio > aspect) {
+        var uo = (1.0-(1.0/aspect))/2;
+        ustart = uo;
+        uend = 1.0-uo;
+    }
+    var hrequire = wrequire/aspect;
+    if (imgRatio < aspect) {
+        var vo = (1.0-(aspect))/2;
+        //var vo = (h-hrequire)*0.5 / h;
+        vstart = vo;
+        vend = 1.0-vo;
+    }
+    osg.log(w+"x"+h + " found uvs " + ustart + ":"+vstart + " " + uend + ":" + vend);
+    return [ [ustart, vstart], [uend, vend] ];
+};
+
 var Organizer = function(x, y) {
     this._x = x;
     this._y = y;
@@ -156,24 +179,18 @@ var organize = new Organizer(X+2,Y+2);
 
 
 var createQuad = function(img) {
-    var factor = 0.2;
-    var w = img.width * factor;
-    var h = img.height * factor;
 
-    var imgRatio = w/h;
-    if (imgRatio < Ratio) {
-        w = h*Ratio;
-        h = Width/Ratio;
-    } else if (imgRatio > Ratio) {
-        h = Width/Ratio;
-        w = Width;
-    }
+    var uvs = cropImage(img.width, img.height, Ratio, Width);
+
     w = Width;
     h = Width/Ratio;
 
     var q = osg.createTexturedQuadGeometry(-w/2, 0, -h/2,
                                            w, 0, 0,
-                                           0, 0, h );
+                                           0, 0, h,
+                                           uvs[0][0],uvs[0][1],
+                                           uvs[1][0],uvs[1][1]
+                                          );
     var t = new osg.Texture();
     t.setImage(img);
     q.getOrCreateStateSet().setTextureAttributeAndMode(0, t);

@@ -204,6 +204,15 @@ var createEffect = function(texture0, texture1, width) {
     var totalSizeX = width;
     var maxx = 20;
 
+    var uvs = cropImage(1920,
+                        1080,
+                        Ratio,
+                        Width);
+
+    var ulenght = (uvs[1][0]-uvs[0][0]);
+    var vlenght = (uvs[1][1]-uvs[0][1]);
+
+
     var sizex = totalSizeX/maxx;
     var maxy = maxx/Ratio;
 
@@ -213,6 +222,8 @@ var createEffect = function(texture0, texture1, width) {
     group.getOrCreateStateSet().setAttributeAndMode(createMosaicShader());
     group.getOrCreateStateSet().addUniform(osg.Uniform.createInt1(0, 'Texture0'));
     group.getOrCreateStateSet().addUniform(osg.Uniform.createInt1(1, 'Texture1'));
+    group.getOrCreateStateSet().setTextureAttributeAndMode(0, texture0);
+    group.getOrCreateStateSet().setTextureAttributeAndMode(1, texture1);
     var cb = new TransitionUpdateCallback();
 
     for (var y = 0; y < maxy; y++) {
@@ -225,10 +236,8 @@ var createEffect = function(texture0, texture1, width) {
 
             var model = createTexturedBox(0,0,0,
                                           size[0], size[1], size[2],
-                                          x/(maxx+1), (x+1)/(maxx+1),
-                                          y/(maxy+1), (y+1)/(maxy+1));
-            model.getOrCreateStateSet().setTextureAttributeAndMode(0, texture0);
-            model.getOrCreateStateSet().setTextureAttributeAndMode(1, texture1);
+                                          uvs[0][0] + ulenght*x/(maxx+1), uvs[0][0] + ulenght*(x+1)/(maxx+1),
+                                          uvs[0][1] + vlenght*y/(maxy+1), uvs[0][1] +vlenght*(y+1)/(maxy+1));
 
             mtr.addChild(model);
             group.addChild(mtr);
