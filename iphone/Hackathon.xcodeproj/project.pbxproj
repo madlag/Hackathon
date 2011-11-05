@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		994F25481464AEE600A2809E /* ScenarioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 994F25461464AEE600A2809E /* ScenarioViewController.m */; };
-		994F25491464AEE600A2809E /* ScenarioViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 994F25471464AEE600A2809E /* ScenarioViewController.xib */; };
+		994F25481464AEE600A2809E /* ScenarioListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 994F25461464AEE600A2809E /* ScenarioListViewController.m */; };
+		994F25491464AEE600A2809E /* ScenarioListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 994F25471464AEE600A2809E /* ScenarioListViewController.xib */; };
 		994F254D1464AFF700A2809E /* Scenario.m in Sources */ = {isa = PBXBuildFile; fileRef = 994F254C1464AFF700A2809E /* Scenario.m */; };
 		997A2EA314648865003C38BD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A2EA214648865003C38BD /* UIKit.framework */; };
 		997A2EA514648865003C38BD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A2EA414648865003C38BD /* Foundation.framework */; };
@@ -16,8 +16,6 @@
 		997A2EAD14648865003C38BD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 997A2EAB14648865003C38BD /* InfoPlist.strings */; };
 		997A2EAF14648865003C38BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 997A2EAE14648865003C38BD /* main.m */; };
 		997A2EB314648865003C38BD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 997A2EB214648865003C38BD /* AppDelegate.m */; };
-		997A2EB614648865003C38BD /* CameraOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 997A2EB514648865003C38BD /* CameraOverlayViewController.m */; };
-		997A2EB914648865003C38BD /* CameraOverlayViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 997A2EB714648865003C38BD /* CameraOverlayViewController.xib */; };
 		99978378146569CC004790E3 /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 99978346146569CC004790E3 /* ASIAuthenticationDialog.m */; };
 		99978379146569CC004790E3 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 99978349146569CC004790E3 /* ASIDataCompressor.m */; };
 		9997837A146569CC004790E3 /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9997834B146569CC004790E3 /* ASIDataDecompressor.m */; };
@@ -62,9 +60,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		994F25451464AEE600A2809E /* ScenarioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenarioViewController.h; sourceTree = "<group>"; };
-		994F25461464AEE600A2809E /* ScenarioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScenarioViewController.m; sourceTree = "<group>"; };
-		994F25471464AEE600A2809E /* ScenarioViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ScenarioViewController.xib; sourceTree = "<group>"; };
+		994F25451464AEE600A2809E /* ScenarioListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ScenarioListViewController.h; sourceTree = "<group>"; };
+		994F25461464AEE600A2809E /* ScenarioListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScenarioListViewController.m; sourceTree = "<group>"; };
+		994F25471464AEE600A2809E /* ScenarioListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ScenarioListViewController.xib; sourceTree = "<group>"; };
 		994F254B1464AFF700A2809E /* Scenario.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scenario.h; sourceTree = "<group>"; };
 		994F254C1464AFF700A2809E /* Scenario.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scenario.m; sourceTree = "<group>"; };
 		997A2E9E14648865003C38BD /* Hackathon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackathon.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,9 +75,6 @@
 		997A2EB014648865003C38BD /* Hackathon-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hackathon-Prefix.pch"; sourceTree = "<group>"; };
 		997A2EB114648865003C38BD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		997A2EB214648865003C38BD /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		997A2EB414648865003C38BD /* CameraOverlayViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraOverlayViewController.h; sourceTree = "<group>"; };
-		997A2EB514648865003C38BD /* CameraOverlayViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraOverlayViewController.m; sourceTree = "<group>"; };
-		997A2EB814648865003C38BD /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/CameraOverlayViewController.xib; sourceTree = "<group>"; };
 		99978345146569CC004790E3 /* ASIAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIAuthenticationDialog.h; sourceTree = "<group>"; };
 		99978346146569CC004790E3 /* ASIAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIAuthenticationDialog.m; sourceTree = "<group>"; };
 		99978347146569CC004790E3 /* ASICacheDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASICacheDelegate.h; sourceTree = "<group>"; };
@@ -222,15 +217,12 @@
 			children = (
 				997A2EB114648865003C38BD /* AppDelegate.h */,
 				997A2EB214648865003C38BD /* AppDelegate.m */,
-				997A2EB414648865003C38BD /* CameraOverlayViewController.h */,
-				997A2EB514648865003C38BD /* CameraOverlayViewController.m */,
-				997A2EB714648865003C38BD /* CameraOverlayViewController.xib */,
 				999783C314656A83004790E3 /* CodeInputViewController.h */,
 				999783C414656A83004790E3 /* CodeInputViewController.m */,
 				999783C514656A83004790E3 /* CodeInputViewController.xib */,
-				994F25451464AEE600A2809E /* ScenarioViewController.h */,
-				994F25461464AEE600A2809E /* ScenarioViewController.m */,
-				994F25471464AEE600A2809E /* ScenarioViewController.xib */,
+				994F25451464AEE600A2809E /* ScenarioListViewController.h */,
+				994F25461464AEE600A2809E /* ScenarioListViewController.m */,
+				994F25471464AEE600A2809E /* ScenarioListViewController.xib */,
 				997A2EA914648865003C38BD /* Supporting Files */,
 				994F254B1464AFF700A2809E /* Scenario.h */,
 				994F254C1464AFF700A2809E /* Scenario.m */,
@@ -433,8 +425,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				997A2EAD14648865003C38BD /* InfoPlist.strings in Resources */,
-				997A2EB914648865003C38BD /* CameraOverlayViewController.xib in Resources */,
-				994F25491464AEE600A2809E /* ScenarioViewController.xib in Resources */,
+				994F25491464AEE600A2809E /* ScenarioListViewController.xib in Resources */,
 				999783C714656A83004790E3 /* CodeInputViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -448,8 +439,7 @@
 			files = (
 				997A2EAF14648865003C38BD /* main.m in Sources */,
 				997A2EB314648865003C38BD /* AppDelegate.m in Sources */,
-				997A2EB614648865003C38BD /* CameraOverlayViewController.m in Sources */,
-				994F25481464AEE600A2809E /* ScenarioViewController.m in Sources */,
+				994F25481464AEE600A2809E /* ScenarioListViewController.m in Sources */,
 				994F254D1464AFF700A2809E /* Scenario.m in Sources */,
 				99978378146569CC004790E3 /* ASIAuthenticationDialog.m in Sources */,
 				99978379146569CC004790E3 /* ASIDataCompressor.m in Sources */,
@@ -499,14 +489,6 @@
 				997A2EAC14648865003C38BD /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		997A2EB714648865003C38BD /* CameraOverlayViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				997A2EB814648865003C38BD /* en */,
-			);
-			name = CameraOverlayViewController.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

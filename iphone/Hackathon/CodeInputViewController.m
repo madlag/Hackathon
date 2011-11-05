@@ -48,7 +48,7 @@
     self.cancelButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)] autorelease];
 
     if (showCancel) {
-        [self.navigationItem setLeftBarButtonItem:self.saveButton];
+        [self.navigationItem setLeftBarButtonItem:self.cancelButton];
     }
     
     [self.navigationItem setRightBarButtonItem:self.saveButton];
@@ -90,7 +90,7 @@
 
 - (void)onSave:(id)sender {
     NSString *code = [self.textField text];  
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost/test.php?code=%@", 
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost/~ataugeron/scenario.php?code=%@", 
                                        [code stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
 
     self.request = [ASIHTTPRequest requestWithURL:url];
