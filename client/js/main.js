@@ -20,6 +20,7 @@
 
 var Viewer;
 var Scene;
+var WorldGallery;
 var main = function() {
     //osg.ReportWebGLError = true;
 
@@ -36,11 +37,13 @@ var main = function() {
     try {
         viewer = new osgViewer.Viewer(canvas, {antialias : true });
         viewer.init();
-        Scene = new osg.Node();
-        createScene(Scene);
-        //createScene();
+
+        var world = new World;
+        WorldGallery = world;
+        var scene = world.getScene();
+
         viewer.getCamera().setClearColor([0.0, 0.0, 0.0, 0.0]);
-        viewer.setSceneData(Scene);
+        viewer.setSceneData(scene);
         viewer.setupManipulator();
         viewer.getManipulator().computeHomePosition();
 
@@ -95,14 +98,17 @@ var Organizer = function(x, y) {
     this._x = x;
     this._y = y;
     this._images = [];
+    this._textures = [];
     this._currentSide = 0;
     this._currentPos = 0;
     this._full = 0;
     this._currentSelected = undefined;
+    this._root = new osg.MatrixTransform();
 };
 
 Organizer.prototype = {
-    
+    getRoot: function () { return this._root; },
+    isFull: function() { return this._full;},
     select: function(index) {
         if (this._currentSelected) {
             this._currentSelected.unselect();
@@ -122,6 +128,8 @@ Organizer.prototype = {
         var h = q.height;
 
         this._images.push(q);
+        var texture = q.getChildren()[0].getStateSet().getTextureAttribute(0,'Texture');
+        this._textures.push(texture);
 
         if (this._currentSide === 0) {
             q.position = [this._currentPos, this._y-1];
@@ -158,12 +166,32 @@ Organizer.prototype = {
                 this._currentSide = 0;
                 this._currentPos = 0;
                 this._full = true;
+                this.createMain();
             }
         }
 
-        Scene.addChild(this._images[this._images.length-1]);
-
+        this._root.addChild(this._images[this._images.length-1]);
         return true;
+    },
+    createMain: function() {
+        var scale = 9;
+        var node = new osg.MatrixTransform();
+        osg.Matrix.makeTranslate(0.25*Width,
+                                 depth,
+                                 0.25*Width/Ratio,
+                                 node.getMatrix());
+
+        osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeScale(scale,
+                                                                  1.0,
+                                                                  scale,
+                                                                  []));
+        
+        var t0 = this._textures[0];
+        var t1 = this._textures[1];
+
+        node.addChild(createEffect(t0, t1, Width));
+        this._root.addChild(node);
+        this._main = node;
     },
     setMainNode: function(main) { this._main = main; },
     getMainNode: function() { return this._main; }
@@ -222,6 +250,11 @@ SelectUpdateCallback.prototype = {
 var currentImageIndex = 0;
 var depth = 0;
 
+var getFakeImageURL = function() {
+    var index = Math.floor(Math.random()*6.0);
+    return "img/Screenshot-"+index.toString()+".png"
+};
+
 var getDummyImage = function() {
     var Images = [ ];
     var max = 6
@@ -235,9 +268,58 @@ var getDummyImage = function() {
     return image;
 };
 
+
+var World = function() {
+    this._groups = [];
+    this._currentGroup;
+    this._scene = new osg.Node();
+    this.createGroup();
+};
+
+World.prototype = {
+    getScene: function() { return this._scene; },
+    createGroup: function() {
+        var o = new Organizer(X+2,Y+2);
+        this._groups.push(o);
+        this._currentGroup = o;
+        this._scene.addChild(o.getRoot());
+        return o;
+    },
+    getOrCreateGroup: function() {
+        if (this._currentGroup && this._currentGroup.isFull()) {
+            this.createGroup();
+        }
+        return this._currentGroup;
+    },
+
+    createQuadFromImage: function(img) {
+        var node = new osg.MatrixTransform();
+        var q = createQuad(img);
+        node.addChild(q);
+        this.push(node);
+        depth++;
+        osg.Matrix.makeTranslate((node.position[0] - X/2 - 0.5)*Width,
+                                 depth,
+                                 (node.position[1] - Y/2 - 0.5)*Width/Ratio,
+                                 node.getMatrix());
+        var rand = (-0.5 + Math.random()) * 0.0;
+        osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeRotate(rand*0.1*Math.PI,0,1,0, []));
+    },
+
+    addImage: function(url) {
+        var grp = this.getOrCreateGroup();
+        var img = new Image;
+        img.onload = function() {
+            World.prototype.createQuadFromImage.call(grp, img);
+        };
+        img.src = url;
+    },
+};
+
+
+
 var getImage = function() {
     var node = new osg.MatrixTransform();
-
 
     if (organize.push(node)) {
         var q = createQuad(getDummyImage());
@@ -289,5 +371,10 @@ function createScene(scene)
 }
 
 
+var fakeEventImage = function(event) {
+    WorldGallery.addImage(getFakeImageURL());
+};
 
 window.addEventListener("load", main ,true);
+window.addEventListener("keyup", fakeEventImage, false);
+

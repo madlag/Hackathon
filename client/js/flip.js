@@ -4,6 +4,11 @@ TransitionUpdateCallback.prototype = {
 
     update: function(node, nv) {
         var t = nv.getFrameStamp().getSimulationTime();
+        if (node._lastUpdate < 0) {
+            node._start += t;
+            node._lastUpdate = node._start;
+        }
+
         var dt = t - node._lastUpdate;
         if (dt < 0) {
             return true;
@@ -244,8 +249,8 @@ var createEffect = function(texture0, texture1, width) {
             mtr.addUpdateCallback(cb);
             //var t = (x*maxy + y)*0.02;
             var t = osg.Vec3.length([-maxx*size[0]*0.5-rx ,0,rz - maxy*size[2]*0.5 ]);
-            t = t*0.008+0.2;
-            mtr._lastUpdate = t;
+            t = t*0.006+1.0;
+            mtr._lastUpdate = -1;
             mtr._start = t;
             mtr._axis = [ Math.random(), 0, Math.random()];
             mtr._axis = [ 1.0, 0, 1.0];
