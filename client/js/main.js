@@ -422,9 +422,8 @@ World.prototype = {
         var q = createQuad(img);
         node.addChild(q);
         this.push(node);
-        depth++;
         osg.Matrix.makeTranslate((node.position[0]),
-                                 depth*20,
+                                 0,
                                  (node.position[1]),
                                  node.getMatrix());
 
