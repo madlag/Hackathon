@@ -10,4 +10,10 @@ body = json.dumps(body)
 u = urllib.urlopen("http://%s:%s/iosclient/" % (server.ADRESS, server.PORT), body)
 print u.read()
 
+data = "12-4914-210i4-01i42-04"
+u = urllib.urlopen("http://%s:%s/upload/" % (server.ADRESS, server.PORT), data)
+print u.read()
+
+
+
 

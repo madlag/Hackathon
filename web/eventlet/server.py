@@ -10,6 +10,7 @@ import redis
 import eventlet.pools
 
 ADRESS="192.168.0.75"
+STORAGE="/tmp/storage/"
 #ADRESS="169.254.205.154"
 PORT = 7000
 SEP=":"
@@ -88,12 +89,24 @@ def handleweb(ws):
 
 
 class App:
-    def __init__(self):
+    def __init__(self, server, port, storage):
         self.channels = collections.defaultdict(Channel)
         self.channelId = 0
         self.redis = redis.Redis("localhost")        
         self.redis = eventlet.pools.Pool(create=lambda: httplib2.Http(timeout=90))
+        self.server = server
+        self.port = port
+        self.storage = storage
 
+    def uploadIdAllocate(self):
+        with REDIS_POOL.item() as client:
+            return client.incr("upload_id") - 1
+
+    def uploadPath(self, id):
+        return os.path.join(self.storage, str(id) + ".jpg")
+
+    def uploadURL(self, id):
+        return "http://%s:%s/storage/%s.jpg" % (self.server, self.port, id)
         
     def channelIdAllocate(self):
         self.channelId += 1
@@ -149,10 +162,8 @@ class App:
 
     def handleios(self, environ, start_response):
         d = environ.get('wsgi.input').read()
-        print d
         message = json.loads(d)
         type = message["type"]
-        print message
         channelId = str(message["value"]["channelId"])
         channel = self.channelGet(channelId)
         
@@ -175,15 +186,45 @@ class App:
         start_response(code, [('content-type', content_type)])            
         return [res]
 
+    def handleupload(self, environ, start_response):
+        d = environ.get('wsgi.input')
+        uploadID = self.uploadIdAllocate()
+        path = self.uploadPath(uploadID)
+        f = open(path, "w")
+
+        while True:
+            s = d.read(8192)
+            if len(s) == 0:
+                break
+            f.write(s)
+        f.close()
+        
+        start_response('200 OK', [('content-type', 'application/json')])
+        url = self.uploadURL(uploadID)
+        ret = json.dumps({"file_url":url})
+
+        return [ret]
+
+    def handlestorage(self, path, environ, start_response):
+        filename = path.split("/")[-1]
+        filename = os.path.join(self.storage, filename)
+        data = open(filename).read()
+        start_response('200 OK', [('content-type', 'image/jpeg')])
+        return [data]        
+
     def dispatch(self, environ, start_response):
         """Resolves to the web page or the websocket depending on the path."""
-    #    print environ
+    #   print environ
         path = environ['PATH_INFO'][1:]
         environ["APP"] = self
         if path.startswith('webclient/'):
             return handleweb(environ, start_response)
         elif path.startswith("iosclient/"):
             return self.handleios(environ, start_response)
+        elif path.startswith("upload/"):
+            return self.handleupload(environ, start_response)
+        elif path.startswith("storage/"):
+            return self.handlestorage(path, environ, start_response)
         else:
             if path == "":
                 path = "webclient.html"
@@ -193,16 +234,30 @@ class App:
             except Exception, e:
                 ret = ""
 
-            if path == "webclient.html":                    
+            if path.startswith("webclient"):
                 ret = ret % {'server': "%s:%s" % (ADRESS,PORT)}
 
             start_response('200 OK', [('content-type', 'text/html')])
             
             return [ret]
+
+def handle_flash_socket_policy(socket):
+    LOG.info(_("Received connection on flash socket policy port"))
+
+    fd = socket.makefile('rw')
+    expected_command = "<policy-file-request/>"
+    if expected_command in fd.read(len(expected_command) + 1):
+        LOG.info(_("Received valid flash socket policy request"))
+        fd.write('<?xml version="1.0"?><cross-domain-policy><allow-'
+                 'access-from domain="*" to-ports="%d" /></cross-'
+                 'domain-policy>' % (FLAGS.vncproxy_port))
+        fd.flush()
+    socket.close()
         
 if __name__ == "__main__":
     # run an example app from the command line            
     listener = eventlet.listen((ADRESS, PORT))
     print "\nVisit http://localhost:7000/ in your websocket-capable browser.\n"
-    app = App()
+    app = App(ADRESS, PORT, STORAGE)
     wsgi.server(listener, app.dispatch)
+

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="swfobject.js"></script>
+<script type="text/javascript" src="web_socket.js"></script>
+<script src="jquery-1.4.3.min.js"></script>
+
+</head>
+<body>
+<h3>Chat!</h3>
+<p>(Only tested in Chrome)</p>
+<div id="pictures">
+</div>
+<div id="chat" style="width: 60em; height: 20em; overflow:auto; border: 1px solid black">
+</div>
+<form id="chatform">
+<input type="text" />
+<input type="submit" />
+</form>
+
+<script src="json2.js"></script>
+
+<script>
+
+  WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
+  // Set this to dump debug message from Flash to console.log:
+  WEB_SOCKET_DEBUG = true;
+
+
+window.onload = function() {
+  var data = {};
+  var s = new WebSocket("ws://%(server)s/webclient/");
+  s.onopen = function() {
+  var scenario = {
+    code: 123456,
+    name: "hello world",
+    scenes: [
+      {
+        title: "Prends une photo de ton cul",
+        help:"Et fais gaffe au cadrage !"
+      },
+      {
+        title: "Prends 2 photos de celui de ta copine",
+        help:"Ou une photo de chacune de tes 2 copines !"
+      },
+    ],
+  }
+    msg = {channelId:124, scenario:scenario};
+    var text = JSON.stringify(msg);
+    s.send(text);
+  };
+  s.onmessage = function(e) {
+    $("#chat").append("<div>" + e.data + "</div>");
+    var data = JSON.parse(e.data);
+    if (data.type == "imageset"){ 
+       var i = 0;
+       for (i = 0; i < data.value.data.length; i++) {
+          $("#pictures").append("<image src='" + data.value.data[i].url + "'/>");
+       }
+    } 
+    if (data.type == "producer_push"){ 
+       $("#pictures").append("<image src='" + data.value.url + "'/>");
+    }
+
+//    alert(data.type);
+
+  };
+  $('#chatform').submit(function (evt) {
+    var line = $('#chatform [type=text]').val()
+    $('#chatform [type=text]').val('')
+    s.send(line);
+    return false;
+  });
+
+
+};
+
+</script>
+
+</body>
+</html>
