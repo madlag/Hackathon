@@ -180,8 +180,8 @@ UpdatePhotoCallback.prototype = {
         var trans = [];
         var maxt = 2.0;
         var ratio = osgAnimation.EaseOutQuart(Math.min(dt*1.0/maxt, 1.0));
-        if (t > maxt) {
-            ratio += (t - maxt) * 0.01;
+        if (dt > maxt) {
+            ratio += (dt - maxt) * 0.01;
         }
 
         if (dt > 2.5) {
