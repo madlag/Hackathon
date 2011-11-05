@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@class CameraOverlayViewController;
-
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
