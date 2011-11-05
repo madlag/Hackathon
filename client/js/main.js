@@ -84,13 +84,13 @@ var cropImage = function(w,h, aspect, wrequire) {
 
     var imgRatio = w/h;
     if (imgRatio > aspect) {
-        var uo = (1.0-(1.0/aspect))/2;
+        var uo = (1.0-(1.0/(aspect/imgRatio)))/2;
         ustart = uo;
         uend = 1.0-uo;
     }
     var hrequire = wrequire/aspect;
     if (imgRatio < aspect) {
-        var vo = (1.0-(aspect))/2;
+        var vo = (1.0-(imgRatio/aspect))/2;
         //var vo = (h-hrequire)*0.5 / h;
         vstart = vo;
         vend = 1.0-vo;
