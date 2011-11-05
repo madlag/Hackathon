@@ -179,9 +179,18 @@ UpdatePhotoCallback.prototype = {
         
         var trans = [];
         var maxt = 2.0;
+        var minRatio = 0.001;
         var ratio = osgAnimation.EaseOutQuart(Math.min(dt*1.0/maxt, 1.0));
-        if (dt > maxt) {
-            ratio += (dt - maxt) * 0.01;
+
+        if (false) {
+            var dratio = ratio - node.lastRatio;
+            if (dratio < minRatio) {
+                ratio = node.lastRatio + minRatio;
+            }
+            node.lastRatio = ratio;
+            if (dt > maxt) {
+                ratio += (dt - maxt) * 0.01;
+            }
         }
 
         if (dt > 2.5) {
@@ -219,6 +228,8 @@ var Organizer = function(x, y) {
     this._currentSelected = undefined;
     this._root = new osg.MatrixTransform();
     this._root.getOrCreateStateSet().setAttributeAndMode(getQuadShader());
+    this._root.getOrCreateStateSet().setAttributeAndMode(new osg.BlendFunc('SRC_ALPHA', 'ONE_MINUS_SRC_ALPHA'));
+    this._root.getOrCreateStateSet().setRenderingHint("TRANSPARENT_BIN");
 
     var w = Width;
     var h = Width/Ratio;
@@ -280,10 +291,6 @@ Organizer.prototype = {
         var w = Width;
         var h = Width/Ratio;
 
-        var material = new osg.Material();
-        q.material = material;
-        q.getOrCreateStateSet().setAttributeAndMode(material);
-        q.getOrCreateStateSet().setAttributeAndMode(new osg.BlendFunc('ONE', 'ONE_MINUS_SRC_ALPHA'));
 
         var layout = this._layout;
 
