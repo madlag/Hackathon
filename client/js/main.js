@@ -125,7 +125,6 @@ var getQuadShader = function() {
             "vec3 normal = mat3(NormalMatrix) * normalize(Normal);",
             "vec3 eye = normalize(-computeEyeDirection());",
             "shade = max(dot(normal,eye), 0.0);",
-            "//shade = 1.0;",
             "FragTexCoord0 = TexCoord0;",
             "}",
             ""
@@ -182,27 +181,18 @@ UpdatePhotoCallback.prototype = {
         var minRatio = 0.001;
         var ratio = osgAnimation.EaseOutQuart(Math.min(dt*1.0/maxt, 1.0));
 
-        if (false) {
-            var dratio = ratio - node.lastRatio;
-            if (dratio < minRatio) {
-                ratio = node.lastRatio + minRatio;
-            }
-            node.lastRatio = ratio;
-            if (dt > maxt) {
-                ratio += (dt - maxt) * 0.01;
-            }
-        }
-
         if (dt > 2.5) {
 
             var parent = node.getParents()[0];
             var m = node.getWorldMatrices()[0];
             var range = 400;
             var depth = -1000;
-            var effect = createWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
+            //var effect = createWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
+            var effect = getOrCreateWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
+
             parent.addChild(effect);
+            effect.setNodeMask(~0x0);
             node.setNodeMask(0x0);
-            //node.effect.setNodeMask(~0x0);
             return true;
         }
         node.fade.get()[0] = ratio;
@@ -216,7 +206,6 @@ UpdatePhotoCallback.prototype = {
     }
 };
 
-var testDissolve = false;
 var Organizer = function(x, y) {
     this._x = x;
     this._y = y;
@@ -255,9 +244,25 @@ var Organizer = function(x, y) {
     this._layout = this.getLayout();
 };
 
+
 Organizer.prototype = {
     getRoot: function () { return this._root; },
     isFull: function() { return this._full;},
+    release: function() {
+        osg.log("release organizer");
+        
+        for (var i = 0, l = this._root.getChildren().length; i < l; i++) {
+            var child = this._root.getChildren()[i];
+            if (child.valid !== undefined) {
+                child.valid = true;
+                osg.log("set child to valid");
+            }
+        }
+        this._root.removeChildren();
+        this._images.length = 0;
+        this._textures.length = 0;
+        WorldGallery.getScene().removeChild(this._root);
+    },
     select: function(index) {
         if (this._currentSelected) {
             this._currentSelected.unselect();
@@ -310,8 +315,9 @@ Organizer.prototype = {
             this._images[i].lastUpdate = -1;
             this._images[i].startTime = Math.random();
         }
+        var self = this;
+        setTimeout(function() { self.release(); }, 12000);
     }
-
 };
 
 var Ratio = 4/3;
@@ -319,8 +325,6 @@ var Width = 400;
 var W2 = Width*12;
 var X = 12;
 var Y = Math.floor(X/Ratio);
-var organize = new Organizer(X+2,Y+2);
-
 
 var createQuad = function(img) {
 
@@ -400,9 +404,7 @@ var World = function() {
             WorldGallery.addImage(getFakeImageURL());
         }
     };
-
     window.addEventListener("keyup", fakeEventImage, false);
-
 };
 
 World.prototype = {
