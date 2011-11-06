@@ -487,9 +487,15 @@ World.prototype = {
         };
 
         for (var i = 0, l = g.getNbImages(); i < l; i++ ) {
-            var url = src.pop();
+            var url;
+            if ( src === this._used ) {
+                url = src.splice(0,1)[0];
+                this._used.push(url);
+            } else {
+                url = src.pop();
+                this._used.push(url);
+            }
             loadImage(url, g);
-            this._used.push(url);
         }
     },
 
