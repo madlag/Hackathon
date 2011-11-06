@@ -1,0 +1,42 @@
+html, body {
+  margin: 0px;
+  padding: 0px;
+}
+
+body {
+  font-family: "Lucida Grande";
+  background: url("../img/paper.png");
+}
+
+.page {
+  width: 800px;
+  margin: 0 auto;
+  padding: 1em 1em 4em;
+}
+
+.header  h1 {
+  font-size: 400%;
+  letter-spacing: -0.05em;
+  text-shadow: 0px 1px 0px #FFF, 0px -1px 0px #AAA;
+  text-align: center;
+  color: #CCC;
+}
+
+h2 {
+  margin: 3rem 0 5px;
+  padding: 0;
+  font-size: 200%;
+  font-weight: normal;
+  letter-spacing: -0.05em;
+}
+
+.img-box {
+  text-align: center;
+  padding: 1em;
+  border: 2px dashed rgba(0,0,0,0.1);
+}
+
+.img-box img {
+  margin: 0px;
+  height: 150px;
+}

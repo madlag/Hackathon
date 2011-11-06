@@ -8,8 +8,11 @@ import collections
 import json
 import redis
 import eventlet.pools
+import thumb
+import mimetypes
 
-ADRESS="192.168.0.75"
+
+ADRESS="0.0.0.0"
 STORAGE="/tmp/storage/"
 #ADRESS="169.254.205.154"
 PORT = 7000
@@ -134,11 +137,13 @@ class App:
             if m is None:
                 return
             m = json.loads(m)
-            channelId = str(m.get("channelId"))
+            channelId = m.get("channelId")
             scenario = m.get("scenario")
 
             if not channelId:
                 channelId = self.channelIdAllocate()
+
+            channelId = str(channelId)
 
             if SEP in channelId:
                 return
@@ -199,6 +204,9 @@ class App:
             f.write(s)
         f.close()
         
+        image, exif = thumb.ThumbCreator.run(path)
+        image.save(path)
+        
         start_response('200 OK', [('content-type', 'application/json')])
         url = self.uploadURL(uploadID)
         ret = json.dumps({"file_url":url})
@@ -233,11 +241,9 @@ class App:
                 ret = open(html_path).read()
             except Exception, e:
                 ret = ""
-
-            if path.startswith("webclient"):
-                ret = ret % {'server': "%s:%s" % (ADRESS,PORT)}
-
-            start_response('200 OK', [('content-type', 'text/html')])
+                
+            content_type, encoding = mimetypes.guess_type(html_path)
+            start_response('200 OK', [('content-type', content_type or 'text/html')])
             
             return [ret]
 
