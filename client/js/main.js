@@ -194,7 +194,7 @@ UpdatePhotoCallback.prototype = {
             var m = node.getWorldMatrices()[0];
             range = 400;
             var depth = -1000;
-            //var effect = createWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
+
             var effect = getOrCreateWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
 
             parent.addChild(effect);
@@ -207,7 +207,7 @@ UpdatePhotoCallback.prototype = {
 
         osg.Matrix.getTrans(node.getMatrix(), trans);
         range = 3000;
-        trans[1] = range + (-ratio) * range;
+        trans[1] = range + (-ratio) * (range + node.position[2]);
         osg.Matrix.setTrans(node.getMatrix(), trans[0], trans[1], trans[2]);
         return true;
     }
@@ -232,22 +232,22 @@ var Organizer = function(x, y, nbImages) {
     var space = 10;
 
     this._layouts = [
-        [ [ 0 , 0]
+        [ [ 0 , 0, 280 ]
         ],
 
-        [ [ -w/2 - space/2, 0],
-          [ w/2 + space/2, 0]
+        [ [ -w/2 - space/2, 0, 180 ],
+          [ w/2 + space/2,  0, 180 ]
         ],
 
-        [ [ -w/2 - space/2, h/2+space/2],
-          [ w/2 + space/2, h/2+space/2],
-          [ 0, -h/2 -space/2]
+        [ [ -w/2 - space/2, h/2+space/2, 10 ],
+          [ w/2 + space/2, h/2+space/2 , 10 ],
+          [ 0, -h/2 -space/2,            10 ]
         ],
 
-        [ [ -w/2 - space/2, h/2+space/2],
-          [ w/2 + space/2, h/2+space/2],
-          [ -w/2 - space/2, -h/2 -space/2],
-          [ w/2 + space/2, -h/2 -space/2]
+        [ [ -w/2 - space/2, h/2+space/2, 0],
+          [ w/2 + space/2, h/2+space/2 , 0],
+          [ -w/2 - space/2, -h/2 -space/2,0],
+          [ w/2 + space/2, -h/2 -space/2, 0]
         ]
     ];
 
