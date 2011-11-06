@@ -229,7 +229,7 @@ var getOrCreateWindEffect = function(texture, target, matrix, time, width, initi
         getOrCreateWindEffect.buffers = [];
     }
 
-    if (true) {
+    if (false) {
         for (var i = 0, l = getOrCreateWindEffect.buffers.length; i < l; i++) {
             if (getOrCreateWindEffect.buffers[i].isValid()) {
                 createWindEffect2(texture, target, matrix, time, width, initialSpeed, getOrCreateWindEffect.buffers[i]);

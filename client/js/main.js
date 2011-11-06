@@ -18,6 +18,12 @@
  *
  */
 
+var Ratio = 4/3;
+var Width = 400;
+var W2 = Width*12;
+var X = 12;
+var Y = Math.floor(X/Ratio);
+
 var Viewer;
 var Scene;
 var WorldGallery;
@@ -38,7 +44,7 @@ var main = function() {
         viewer = new osgViewer.Viewer(canvas, {antialias : true });
         viewer.init();
 
-        var world = new World;
+        var world = new World();
         WorldGallery = world;
         var scene = world.getScene();
 
@@ -48,7 +54,7 @@ var main = function() {
         viewer.getManipulator().setTarget([0,0,0]);
         viewer.getManipulator().setDistance(300);
         viewer.getManipulator().getInverseMatrix = function() {
-            return osg.Matrix.makeLookAt([0,-600,0], [0,0,0], [0,0,1], []);
+            return osg.Matrix.makeLookAt([0,-550,0], [0,0,0], [0,0,1], []);
         };
         viewer.setSceneData(scene);
 
@@ -181,11 +187,12 @@ UpdatePhotoCallback.prototype = {
         var minRatio = 0.001;
         var ratio = osgAnimation.EaseOutQuart(Math.min(dt*1.0/maxt, 1.0));
 
-        if (dt > 2.5) {
+        var range;
+        if (dt > 3.0) {
 
             var parent = node.getParents()[0];
             var m = node.getWorldMatrices()[0];
-            var range = 400;
+            range = 400;
             var depth = -1000;
             //var effect = createWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
             var effect = getOrCreateWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
@@ -199,14 +206,14 @@ UpdatePhotoCallback.prototype = {
         node.fade.dirty();
 
         osg.Matrix.getTrans(node.getMatrix(), trans);
-        var range = 3000;
+        range = 3000;
         trans[1] = range + (-ratio) * range;
         osg.Matrix.setTrans(node.getMatrix(), trans[0], trans[1], trans[2]);
         return true;
     }
 };
 
-var Organizer = function(x, y) {
+var Organizer = function(x, y, nbImages) {
     this._x = x;
     this._y = y;
     this._images = [];
@@ -225,13 +232,16 @@ var Organizer = function(x, y) {
     var space = 10;
 
     this._layouts = [
-        [ [ -w/2 - space/2, h/2+space/2],
-          [ w/2 + space/2, h/2+space/2],
-          [ 0, -h/2 -space/2]
+        [ [ 0 , 0]
         ],
 
         [ [ -w/2 - space/2, 0],
           [ w/2 + space/2, 0]
+        ],
+
+        [ [ -w/2 - space/2, h/2+space/2],
+          [ w/2 + space/2, h/2+space/2],
+          [ 0, -h/2 -space/2]
         ],
 
         [ [ -w/2 - space/2, h/2+space/2],
@@ -241,11 +251,12 @@ var Organizer = function(x, y) {
         ]
     ];
 
-    this._layout = this.getLayout();
+    this._layout = this.getLayout(nbImages);
 };
 
 
 Organizer.prototype = {
+    setStartCallback: function(cb) { this._startCallback = cb; },
     getRoot: function () { return this._root; },
     isFull: function() { return this._full;},
     release: function() {
@@ -271,8 +282,11 @@ Organizer.prototype = {
         var newone = this._images[index%this._images.length];
         newone.select();
     },
+    getNbImages: function() { return this._layout.length; },
+    getLayout: function(nbImages) {
+        var idx = Math.floor(Math.random()*Math.min(nbImages,4));
+        return this._layouts[idx];
 
-    getLayout: function() {
         var idx = Math.floor(Math.random() * (this._layouts.length)) % this._layouts.length;
         return this._layouts[idx];
     },
@@ -310,6 +324,25 @@ Organizer.prototype = {
         return true;
     },
 
+
+    createQuadFromImage: function(img) {
+        if (this.isFull()) {
+            return;
+        }
+        var node = new osg.MatrixTransform();
+        var q = createQuad(img);
+        node.addChild(q);
+        this.push(node);
+        osg.Matrix.makeTranslate((node.position[0]),
+                                 0,
+                                 (node.position[1]),
+                                 node.getMatrix());
+
+        var rand = (-0.5 + Math.random()) * 0.0;
+        osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeRotate(rand*0.1*Math.PI,0,1,0, []));
+    },
+
+
     start: function() {
         for (var i = 0, l = this._images.length; i < l; i++) {
             this._images[i].lastUpdate = -1;
@@ -317,14 +350,10 @@ Organizer.prototype = {
         }
         var self = this;
         setTimeout(function() { self.release(); }, 12000);
+        this._startCallback();
     }
 };
 
-var Ratio = 4/3;
-var Width = 400;
-var W2 = Width*12;
-var X = 12;
-var Y = Math.floor(X/Ratio);
 
 var createQuad = function(img) {
 
@@ -372,16 +401,16 @@ var depth = 0;
 
 var getFakeImageURL = function() {
     var index = Math.floor(Math.random()*6.0);
-    return "img/Screenshot-"+index.toString()+".png"
+    return "img/Screenshot-"+index.toString()+".png";
 };
 
 var getDummyImage = function() {
     var Images = [ ];
-    var max = 6
+    var max = 6;
     for (var i = 0, l = max; i < l; i++) {
         Images.push("img/Screenshot-"+i.toString()+".png");
     }
-    var image = new Image;
+    var image = new Image();
     var idx = currentImageIndex % max;
     image.src = Images[idx];
     currentImageIndex++;
@@ -392,9 +421,14 @@ var getDummyImage = function() {
 
 var World = function() {
     this._groups = [];
-    this._currentGroup;
+    this._currentGroup = undefined;
     this._scene = new osg.Node();
     this.createGroup();
+
+    this._news = [];
+    this._used = [];
+
+    this._timeoutStarted = undefined;
 
     var fakeEventImage = function(event) {
         if (event.keyCode === 32) {
@@ -405,49 +439,73 @@ var World = function() {
         }
     };
     window.addEventListener("keyup", fakeEventImage, false);
+
+    this.start();
 };
 
 World.prototype = {
     getScene: function() { return this._scene; },
-    createGroup: function() {
-        var o = new Organizer(X+2,Y+2);
+    createGroup: function(nbImages) {
+        var o = new Organizer(X+2,Y+2, nbImages);
         this._groups.push(o);
         this._currentGroup = o;
         this._scene.addChild(o.getRoot());
         return o;
     },
-    getOrCreateGroup: function() {
+    getOrCreateGroup: function(nbImages) {
         if (this._currentGroup && this._currentGroup.isFull()) {
-            this.createGroup();
+            this.createGroup(nbImages);
         }
         return this._currentGroup;
     },
 
-    createQuadFromImage: function(img) {
-        if (this.isFull()) {
+    start: function() {
+
+        var src;
+        if (this._news.length > 0) {
+            src = this._news;
+        } else {
+            src = this._used;
+        }
+        
+        if (src.length === 0) {
+            this.retryLater();
             return;
         }
-        var node = new osg.MatrixTransform();
-        var q = createQuad(img);
-        node.addChild(q);
-        this.push(node);
-        osg.Matrix.makeTranslate((node.position[0]),
-                                 0,
-                                 (node.position[1]),
-                                 node.getMatrix());
+        var self = this;
 
-        var rand = (-0.5 + Math.random()) * 0.0;
-        osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeRotate(rand*0.1*Math.PI,0,1,0, []));
+        var g = this.createGroup(src.length);
+        g.setStartCallback(function() { self.startCallback(); } );
+
+
+        var loadImage = function(url, g) {
+            var img = new Image();
+            img.onload = function() {
+                g.createQuadFromImage(img);
+            };
+            img.src = url;
+        };
+
+        for (var i = 0, l = g.getNbImages(); i < l; i++ ) {
+            var url = src.pop();
+            loadImage(url, g);
+            this._used.push(url);
+        }
+    },
+
+    retryLater: function() {
+        var self = this;
+        setTimeout(function() { self.start(); }, 1000);
+    },
+
+    startCallback: function() {
+        var self = this;
+        setTimeout(function() { self.start(); }, 6000);
     },
 
     addImage: function(url) {
-        var grp = this.getOrCreateGroup();
-        var img = new Image;
-        img.onload = function() {
-            World.prototype.createQuadFromImage.call(grp, img);
-        };
-        img.src = url;
-    },
+        this._news.push(url);
+    }
 };
 
 
