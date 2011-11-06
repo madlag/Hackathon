@@ -14,15 +14,21 @@
 @interface UploadController()
 -(void)onPictureUploaded:(ASIHTTPRequest *)request;
 -(void)onPushDone:(ASIHTTPRequest *)request;
+- (void)registerDefaultsFromSettingsBundle;
 @end
 
 @implementation UploadController
+@synthesize channelId;
 
--(id)initWithChannelId:(NSString *)anId {
+-(id)init {
     if ((self = [super init])) {
-        // Save the channel ID
-        channelId = [anId retain];
+        // Init the queue
         pictureQueue = [[NSMutableArray alloc] initWithCapacity:10];
+        
+        // Get the server URL from preferences
+        [self registerDefaultsFromSettingsBundle];
+        serverUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"];
+        NSLog(@"Server URL: %@", serverUrl);
     }
     
     return self;
@@ -31,6 +37,7 @@
 -(void)dealloc {
     [channelId release];
     [pictureQueue release];
+    [serverUrl release];
     [super dealloc];
 }
 
@@ -52,7 +59,7 @@
 -(void)checkQueue {
     if ([pictureQueue count] > 0) {
         // Build the upload URL
-        NSString *stringUrl = [NSString stringWithFormat:@"%@%@", SERVER_URL, UPLOAD_SERVICE];
+        NSString *stringUrl = [NSString stringWithFormat:@"%@%@", serverUrl, UPLOAD_SERVICE];
         NSURL *url = [NSURL URLWithString:stringUrl];
         
         // Build the upload request and start it
@@ -84,7 +91,7 @@
     NSData *requestData = [jsonWriter dataWithObject:requestDict];
     
     // Build the push url
-    NSString *stringUrl = [NSString stringWithFormat:@"%@%@", SERVER_URL, PUSH_SERVICE];
+    NSString *stringUrl = [NSString stringWithFormat:@"%@%@", serverUrl, PUSH_SERVICE];
     NSURL *url = [NSURL URLWithString:stringUrl];
     
     // Build the push request and start it
@@ -109,6 +116,31 @@
 -(void)requestFailed:(ASIHTTPRequest *)request {
     NSLog(@"Request failed - Error: %@", request.error.localizedDescription);
     [self checkQueue];
+}
+
+
+#pragma mark - Preferences
+
+- (void)registerDefaultsFromSettingsBundle {
+    NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+    if(!settingsBundle) {
+        NSLog(@"Could not find Settings.bundle");
+        return;
+    }
+    
+    NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:@"Root.plist"]];
+    NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
+    
+    NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
+    for(NSDictionary *prefSpecification in preferences) {
+        NSString *key = [prefSpecification objectForKey:@"Key"];
+        if(key) {
+            [defaultsToRegister setObject:[prefSpecification objectForKey:@"DefaultValue"] forKey:key];
+        }
+    }
+    
+    [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
+    [defaultsToRegister release];
 }
 
 @end

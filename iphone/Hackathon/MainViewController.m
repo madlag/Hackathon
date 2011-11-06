@@ -19,7 +19,11 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+        // Set up the upload controller
+        uploadController = [[UploadController alloc] init];
+        
+        // Set up the camera
+        [self setupCamera];
     }
     return self;
 }
@@ -73,21 +77,24 @@
 
 -(void)onEnterCode:(NSString *)code {
     
-    // Set up the upload controller
-    uploadController = [[UploadController alloc] initWithChannelId:code];
-    
     // Display a new camera view
     [self showCamera];
+    
+    // Save the code
+    [uploadController performSelectorInBackground:@selector(setChannelId:) withObject:code];
     
 }
 
 
 #pragma mark Camera
 
--(void)showCamera {
+-(void)setupCamera {
     camera = [[UIImagePickerController alloc] init];
     camera.sourceType = UIImagePickerControllerSourceTypeCamera;
-    camera.delegate = self;
+    camera.delegate = self;   
+}
+
+-(void)showCamera {
     [self presentModalViewController:camera animated:NO];
 }
 
@@ -100,6 +107,7 @@
     UIImagePickerController *oldCamera = camera;
     [oldCamera dismissModalViewControllerAnimated:NO];
     [oldCamera release];
+    [self setupCamera];
     [self showCamera];
 }
 

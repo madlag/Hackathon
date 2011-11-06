@@ -12,6 +12,5 @@ CGFloat const PICTURE_LARGE_SIDE = 400;
 CGFloat const PICTURE_SMALL_SIDE = 300;
 CGFloat const PICTURE_COMPRESSION = 0.4;
 
-NSString * const SERVER_URL = @"http://192.168.0.75:7000/";
 NSString * const UPLOAD_SERVICE = @"upload/";
 NSString * const PUSH_SERVICE = @"iosclient/";

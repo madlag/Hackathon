@@ -10,6 +10,5 @@ extern CGFloat const PICTURE_LARGE_SIDE;
 extern CGFloat const PICTURE_SMALL_SIDE;
 extern CGFloat const PICTURE_COMPRESSION;
 
-extern NSString * const SERVER_URL;
 extern NSString * const UPLOAD_SERVICE;
 extern NSString * const PUSH_SERVICE;

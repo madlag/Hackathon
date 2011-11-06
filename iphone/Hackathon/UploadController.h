@@ -12,9 +12,11 @@
 @interface UploadController : NSObject <ASIHTTPRequestDelegate> {
     NSString *channelId;
     NSMutableArray *pictureQueue;
+    NSString *serverUrl;
 }
 
--(id)initWithChannelId:(NSString *)anId;
+@property (nonatomic, retain) NSString *channelId;
+
 -(void)addPictureToUpload:(UIImage *)picture;
 -(void)checkQueue;
 
