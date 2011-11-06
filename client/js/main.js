@@ -130,7 +130,7 @@ var getQuadShader = function() {
             "gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(Vertex,1.0);",
             "vec3 normal = mat3(NormalMatrix) * normalize(Normal);",
             "vec3 eye = normalize(-computeEyeDirection());",
-            "shade = max(dot(normal,eye), 0.0);",
+            "shade = max(dot(normal,vec3(0.0 ,0.0,1.0)), 0.0);",
             "FragTexCoord0 = TexCoord0;",
             "}",
             ""
