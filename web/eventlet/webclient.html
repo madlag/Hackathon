@@ -1,81 +1,165 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link href='http://fonts.googleapis.com/css?family=Allerta' rel='stylesheet' type='text/css'>
+
+<style type="text/css" media="screen">
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+    
+  body {
+    /*font-family: "Lucida Grande";*/
+  }
+  
+  .codePane {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: #000 url('img/black-linen.png') center center;
+  }
+  
+  .codePane .code {
+    position: absolute;
+    top: 50%;
+    left: 0px;
+    width: 100%;
+    margin-top: -1em;
+    line-height: 2em;
+    text-align: center;
+    color: #EEE;
+    font-family: 'Allerta', sans-serif;  
+    font-size: 1500%;
+    text-shadow: 0px 0px 10px #000;
+  }
+  
+  .imagesPane {
+    background: #000;
+  }
+  
+</style>
+<script type="text/javascript" src="js/spoutnik.js"></script>
 <script type="text/javascript" src="js/swfobject.js"></script>
 <script type="text/javascript" src="js/web_socket.js"></script>
-<script src="js/jquery-1.4.3.min.js"></script>
 <script src="js/json2.js"></script>
 
+<script type="text/javascript" src="osg/js/osg-debug.js"></script>
+<script type="text/javascript" src="osg/js/main.js"></script>
+<script type="text/javascript" src="osg/js/flip.js"></script>
+<script type="text/javascript" src="osg/js/wind.js"></script>
+<script type="text/javascript" src="osg/js/plane.js"></script>
 </head>
 <body>
-<h3>Chat!</h3>
-<p>(Only tested in Chrome)</p>
-<div id="pictures">
-</div>
-<div id="chat" style="width: 60em; height: 20em; overflow:auto; border: 1px solid black">
-</div>
-<form id="chatform">
-<input type="text" />
-<input type="submit" />
-</form>
-
-
+  <div class="codePane" style="display:none"><span class="code"></d></div>
+  <div class="imagesPane" style="display:none">
+    <div id="loading"> </div>
+    <div id="ViewContainer">
+      <canvas id="3DView"></canvas>
+    </div>
+    <div id="Parameters">
+      <button id="ClearStorage" name="ClearStorage" 
+        onclick="if (window.localStorage) { window.localStorage.clear();}">Reset Default Value</button>
+    </div>
+  </div>
 <script>
 
-  WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
-  // Set this to dump debug message from Flash to console.log:
-  WEB_SOCKET_DEBUG = true;
-
-
-window.onload = function() {
-  var data = {};
-  var s = new WebSocket("ws://%(server)s/webclient/");
-  s.onopen = function() {
-  var scenario = {
-    code: 123456,
-    name: "hello world",
-    scenes: [
-      {
-        title: "Prends une photo de ton cul",
-        help:"Et fais gaffe au cadrage !"
-      },
-      {
-        title: "Prends 2 photos de celui de ta copine",
-        help:"Ou une photo de chacune de tes 2 copines !"
-      },
-    ],
-  }
-    msg = {channelId:124, scenario:scenario};
-    var text = JSON.stringify(msg);
-    s.send(text);
-  };
-  s.onmessage = function(e) {
-    $("#chat").append("<div>" + e.data + "</div>");
-    var data = JSON.parse(e.data);
-    if (data.type == "imageset"){ 
-       var i = 0;
-       for (i = 0; i < data.value.data.length; i++) {
-          $("#pictures").append("<image src='" + data.value.data[i].url + "'/>");
-       }
-    } 
-    if (data.type == "producer_push"){ 
-       $("#pictures").append("<image src='" + data.value.url + "'/>");
+  window.WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
+  window.WEB_SOCKET_DEBUG = true;
+  
+  var Application = {
+    
+    $: function(path){
+      return Sx.find(path, this.view);
+    },
+    
+    proxy: function(name){
+      if(!this.bound) this.bound = {};
+      return this.bound[name] || (this.bound[name] = this[name].bind(this));
+    },
+    
+    show: function(path, name){
+      var stage = (typeof(path)=='string'?this.$(path):path);
+      if(stage != this._stage){
+        if(this._stage){
+          Sx.hide(this._stage);
+        }
+        this._stage = Sx.show(stage);
+      }
+      return this._stage;
+    },
+    
+    initialize: function(){
+      this.view = window.document.body;
+      
+      var req = new Sx.Url(window.location.toString());
+      this.code = req.params.code;
+      
+      this.socket = new WebSocket("ws://0.0.0.0:7000/webclient/");  
+      this.socket.onopen = this.proxy('initSocket');
+      this.socket.onmessage = this.proxy('dispatchMessage');
+      
+      this.showCode();
+      
+    },
+    
+    initSocket: function(){
+      var data = {scenario: {}};
+      if(this.code){
+        data.channelId = this.code;
+      }
+      this.send(data);
+    },
+    
+    send: function(data){
+      var jsonString = JSON.stringify(data);
+      console.log('sent', jsonString);
+      this.socket.send(jsonString);
+    },
+    
+    dispatchMessage: function(msg){
+      var data = JSON.parse(msg.data);
+      console.log(data);
+      
+      var handlerName = "on" + Sx.capitalize(data.type);
+      var handler; if(handler = this[handlerName]){
+        handler.call(this, data.value);
+      }else{
+        throw('No handler for: ' + data.type)
+      }
+    },
+    
+    onImageset: function(data){
+      if(!this.code){
+        this.code = data.channelId;
+        this.showCode();
+      }
+      
+      if(data.data){
+        for(var imgData, i=0; imgData = data.data[i]; i++){
+          this.onProducer_push(imgData);
+        }
+      }
+    },
+    
+    onProducer_push: function(data){
+      console.log('push', data);
+      this.show('.imagesPane');
+      WorldGallery.addImage(data.url)
+    },    
+    
+    showCode: function(){
+      this.show('.codePane');
+      this.$('.codePane .code').innerHTML = this.code || "...";
     }
-
-//    alert(data.type);
-
   };
-  $('#chatform').submit(function (evt) {
-    var line = $('#chatform [type=text]').val()
-    $('#chatform [type=text]').val('')
-    s.send(line);
-    return false;
+  
+  window.addEventListener("load", function(){
+    Application.initialize();
   });
-
-
-};
-
 </script>
-
 </body>
 </html>
