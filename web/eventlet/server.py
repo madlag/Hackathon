@@ -9,6 +9,8 @@ import json
 import redis
 import eventlet.pools
 import thumb
+import mimetypes
+
 
 ADRESS="0.0.0.0"
 STORAGE="/tmp/storage/"
@@ -135,11 +137,13 @@ class App:
             if m is None:
                 return
             m = json.loads(m)
-            channelId = str(m.get("channelId"))
+            channelId = m.get("channelId")
             scenario = m.get("scenario")
 
             if not channelId:
                 channelId = self.channelIdAllocate()
+
+            channelId = str(channelId)
 
             if SEP in channelId:
                 return
@@ -237,8 +241,9 @@ class App:
                 ret = open(html_path).read()
             except Exception, e:
                 ret = ""
-
-            start_response('200 OK', [('content-type', 'text/html')])
+                
+            content_type, encoding = mimetypes.guess_type(html_path)
+            start_response('200 OK', [('content-type', content_type or 'text/html')])
             
             return [ret]
 
