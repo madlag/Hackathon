@@ -2,46 +2,8 @@
 <html>
 <head>
 <link href='http://fonts.googleapis.com/css?family=Allerta' rel='stylesheet' type='text/css'>
+<link href="css/base.css" rel="stylesheet" type="text/css" charset="utf-8">
 
-<style type="text/css" media="screen">
-  
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-    
-  body {
-    /*font-family: "Lucida Grande";*/
-  }
-  
-  .codePane {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    background: #000 url('img/black-linen.png') center center;
-  }
-  
-  .codePane .code {
-    position: absolute;
-    top: 50%;
-    left: 0px;
-    width: 100%;
-    margin-top: -1em;
-    line-height: 2em;
-    text-align: center;
-    color: #EEE;
-    font-family: 'Allerta', sans-serif;  
-    font-size: 1500%;
-    text-shadow: 0px 0px 10px #000;
-  }
-  
-  .imagesPane {
-    background: #000;
-  }
-  
-</style>
 <script type="text/javascript" src="js/spoutnik.js"></script>
 <script type="text/javascript" src="js/swfobject.js"></script>
 <script type="text/javascript" src="js/web_socket.js"></script>
@@ -103,7 +65,6 @@
       this.socket.onmessage = this.proxy('dispatchMessage');
       
       this.showCode();
-      
     },
     
     initSocket: function(){
@@ -116,14 +77,12 @@
     
     send: function(data){
       var jsonString = JSON.stringify(data);
-      console.log('sent', jsonString);
       this.socket.send(jsonString);
     },
     
     dispatchMessage: function(msg){
       var data = JSON.parse(msg.data);
-      console.log(data);
-      
+      console.log(data.type, data.value);
       var handlerName = "on" + Sx.capitalize(data.type);
       var handler; if(handler = this[handlerName]){
         handler.call(this, data.value);
@@ -146,9 +105,8 @@
     },
     
     onProducer_push: function(data){
-      console.log('push', data);
       this.show('.imagesPane');
-      WorldGallery.addImage(data.url)
+      WorldGallery.addImage(data.url);
     },    
     
     showCode: function(){
