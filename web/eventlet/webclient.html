@@ -1,55 +1,123 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Allerta' rel='stylesheet' type='text/css'>
+<link href="css/base.css" rel="stylesheet" type="text/css" charset="utf-8">
+
+<script type="text/javascript" src="js/spoutnik.js"></script>
+<script type="text/javascript" src="js/swfobject.js"></script>
+<script type="text/javascript" src="js/web_socket.js"></script>
+<script src="js/json2.js"></script>
+
+<script type="text/javascript" src="osg/js/osg-debug.js"></script>
+<script type="text/javascript" src="osg/js/main.js"></script>
+<script type="text/javascript" src="osg/js/flip.js"></script>
+<script type="text/javascript" src="osg/js/wind.js"></script>
+<script type="text/javascript" src="osg/js/plane.js"></script>
 </head>
 <body>
-<h3>Chat!</h3>
-<p>(Only tested in Chrome)</p>
-<div id="chat" style="width: 60em; height: 20em; overflow:auto; border: 1px solid black">
-</div>
-<form id="chatform">
-<input type="text" />
-<input type="submit" />
-</form>
-
-<script src="socket.io.js"></script>
-<script>
-  /*
-  var socket = io.connect('ws://localhost');
-  socket.emit('channel_id', { id: '123' });
-
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
-*/
-</script>
-
-
+  <div class="codePane" style="display:none"><span class="code"></d></div>
+  <div class="imagesPane" style="display:none">
+    <div id="loading"> </div>
+    <div id="ViewContainer">
+      <canvas id="3DView"></canvas>
+    </div>
+    <div id="Parameters">
+      <button id="ClearStorage" name="ClearStorage" 
+        onclick="if (window.localStorage) { window.localStorage.clear();}">Reset Default Value</button>
+    </div>
+  </div>
 <script>
 
-window.onload = function() {
-  var data = {};
-  var s = new WebSocket("ws://127.0.0.1:%(port)s/webclient/?channelID=124");
-  s.onopen = function() {
-    s.send('New participant joined');
+  window.WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
+  window.WEB_SOCKET_DEBUG = true;
+  
+  var Application = {
+    
+    $: function(path){
+      return Sx.find(path, this.view);
+    },
+    
+    proxy: function(name){
+      if(!this.bound) this.bound = {};
+      return this.bound[name] || (this.bound[name] = this[name].bind(this));
+    },
+    
+    show: function(path, name){
+      var stage = (typeof(path)=='string'?this.$(path):path);
+      if(stage != this._stage){
+        if(this._stage){
+          Sx.hide(this._stage);
+        }
+        this._stage = Sx.show(stage);
+      }
+      return this._stage;
+    },
+    
+    initialize: function(){
+      this.view = window.document.body;
+      
+      var req = new Sx.Url(window.location.toString());
+      this.code = req.params.code;
+      
+      this.socket = new WebSocket("ws://0.0.0.0:7000/webclient/");  
+      this.socket.onopen = this.proxy('initSocket');
+      this.socket.onmessage = this.proxy('dispatchMessage');
+      
+      this.showCode();
+    },
+    
+    initSocket: function(){
+      var data = {scenario: {}};
+      if(this.code){
+        data.channelId = this.code;
+      }
+      this.send(data);
+    },
+    
+    send: function(data){
+      var jsonString = JSON.stringify(data);
+      this.socket.send(jsonString);
+    },
+    
+    dispatchMessage: function(msg){
+      var data = JSON.parse(msg.data);
+      console.log(data.type, data.value);
+      var handlerName = "on" + Sx.capitalize(data.type);
+      var handler; if(handler = this[handlerName]){
+        handler.call(this, data.value);
+      }else{
+        throw('No handler for: ' + data.type)
+      }
+    },
+    
+    onImageset: function(data){
+      if(!this.code){
+        this.code = data.channelId;
+        this.showCode();
+      }
+      
+      if(data.data){
+        for(var imgData, i=0; imgData = data.data[i]; i++){
+          this.onProducer_push(imgData);
+        }
+      }
+    },
+    
+    onProducer_push: function(data){
+      this.show('.imagesPane');
+      WorldGallery.addImage(data.url);
+    },    
+    
+    showCode: function(){
+      this.show('.codePane');
+      this.$('.codePane .code').innerHTML = this.code || "...";
+    }
   };
-  s.onmessage = function(e) {
-    $("#chat").append("<div>" + e.data + "</div>");
-  };
-  $('#chatform').submit(function (evt) {
-    var line = $('#chatform [type=text]').val()
-    $('#chatform [type=text]').val('')
-    s.send(line);
-    return false;
+  
+  window.addEventListener("load", function(){
+    Application.initialize();
   });
-
-  s.send("coucou");
-
-};
-
 </script>
-
 </body>
 </html>

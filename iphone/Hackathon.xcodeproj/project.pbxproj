@@ -12,6 +12,11 @@
 		39B7D2F11465781700324A05 /* StepViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39B7D2EF1465781700324A05 /* StepViewController.m */; };
 		39B7D2F21465781700324A05 /* StepViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 39B7D2F01465781700324A05 /* StepViewController.xib */; };
 		39C525A2146599A700467BEC /* UIImageExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 39C525A1146599A700467BEC /* UIImageExtensions.m */; };
+		39C525A81465A16400467BEC /* UploadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39C525A71465A16400467BEC /* UploadController.m */; };
+		39C525AB1465A2FF00467BEC /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 39C525AA1465A2FF00467BEC /* Constants.m */; };
+		39C525AE1465A4B200467BEC /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39C525AD1465A4B200467BEC /* MainViewController.m */; };
+		39C525B01465E26D00467BEC /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 39C525AF1465E26C00467BEC /* Settings.bundle */; };
+		39C525B21465F4FB00467BEC /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 39C525B11465F4FB00467BEC /* Icon.png */; };
 		994F25481464AEE600A2809E /* ScenarioListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 994F25461464AEE600A2809E /* ScenarioListViewController.m */; };
 		994F25491464AEE600A2809E /* ScenarioListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 994F25471464AEE600A2809E /* ScenarioListViewController.xib */; };
 		994F254D1464AFF700A2809E /* Scenario.m in Sources */ = {isa = PBXBuildFile; fileRef = 994F254C1464AFF700A2809E /* Scenario.m */; };
@@ -71,8 +76,16 @@
 		39B7D2EE1465781700324A05 /* StepViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StepViewController.h; sourceTree = "<group>"; };
 		39B7D2EF1465781700324A05 /* StepViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StepViewController.m; sourceTree = "<group>"; };
 		39B7D2F01465781700324A05 /* StepViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StepViewController.xib; sourceTree = "<group>"; };
-		39C525A0146599A700467BEC /* UIImageExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIImageExtensions.h; sourceTree = "<group>"; };
-		39C525A1146599A700467BEC /* UIImageExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageExtensions.m; sourceTree = "<group>"; };
+		39C525A0146599A700467BEC /* UIImageExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UIImageExtensions.h; path = Hackathon/UIImageExtensions.h; sourceTree = "<group>"; };
+		39C525A1146599A700467BEC /* UIImageExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UIImageExtensions.m; path = Hackathon/UIImageExtensions.m; sourceTree = "<group>"; };
+		39C525A61465A16400467BEC /* UploadController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UploadController.h; sourceTree = "<group>"; };
+		39C525A71465A16400467BEC /* UploadController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UploadController.m; sourceTree = "<group>"; };
+		39C525A91465A2FF00467BEC /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		39C525AA1465A2FF00467BEC /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
+		39C525AC1465A4B200467BEC /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		39C525AD1465A4B200467BEC /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		39C525AF1465E26C00467BEC /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		39C525B11465F4FB00467BEC /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		994F25451464AEE600A2809E /* ScenarioListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenarioListViewController.h; sourceTree = "<group>"; };
 		994F25461464AEE600A2809E /* ScenarioListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScenarioListViewController.m; sourceTree = "<group>"; };
 		994F25471464AEE600A2809E /* ScenarioListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ScenarioListViewController.xib; sourceTree = "<group>"; };
@@ -191,16 +204,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		39C525A414659FF600467BEC /* Not used */ = {
+			isa = PBXGroup;
+			children = (
+				994F254B1464AFF700A2809E /* Scenario.h */,
+				994F254C1464AFF700A2809E /* Scenario.m */,
+				999783C014656A70004790E3 /* Scene.h */,
+				999783C114656A70004790E3 /* Scene.m */,
+				994F25451464AEE600A2809E /* ScenarioListViewController.h */,
+				994F25461464AEE600A2809E /* ScenarioListViewController.m */,
+				994F25471464AEE600A2809E /* ScenarioListViewController.xib */,
+				39B7D2E21465707800324A05 /* ScenarioViewController.h */,
+				39B7D2E31465707800324A05 /* ScenarioViewController.m */,
+				39B7D2E41465707800324A05 /* ScenarioViewController.xib */,
+				39B7D2EE1465781700324A05 /* StepViewController.h */,
+				39B7D2EF1465781700324A05 /* StepViewController.m */,
+				39B7D2F01465781700324A05 /* StepViewController.xib */,
+			);
+			name = "Not used";
+			sourceTree = "<group>";
+		};
 		997A2E9314648865003C38BD = {
 			isa = PBXGroup;
 			children = (
-				999783BE14656A2D004790E3 /* libz.dylib */,
-				999783BC14656A25004790E3 /* MobileCoreServices.framework */,
-				999783BA14656A16004790E3 /* SystemConfiguration.framework */,
-				999783B814656A0A004790E3 /* CFNetwork.framework */,
-				9997838E146569D8004790E3 /* Reachability */,
-				99978391146569D8004790E3 /* SBJSON */,
-				99978344146569CC004790E3 /* ASI */,
 				997A2EA814648865003C38BD /* Hackathon */,
 				997A2EA114648865003C38BD /* Frameworks */,
 				997A2E9F14648865003C38BD /* Products */,
@@ -218,6 +244,15 @@
 		997A2EA114648865003C38BD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				39C525A0146599A700467BEC /* UIImageExtensions.h */,
+				39C525A1146599A700467BEC /* UIImageExtensions.m */,
+				9997838E146569D8004790E3 /* Reachability */,
+				99978391146569D8004790E3 /* SBJSON */,
+				99978344146569CC004790E3 /* ASI */,
+				999783BE14656A2D004790E3 /* libz.dylib */,
+				999783BC14656A25004790E3 /* MobileCoreServices.framework */,
+				999783BA14656A16004790E3 /* SystemConfiguration.framework */,
+				999783B814656A0A004790E3 /* CFNetwork.framework */,
 				997A2EA214648865003C38BD /* UIKit.framework */,
 				997A2EA414648865003C38BD /* Foundation.framework */,
 				997A2EA614648865003C38BD /* CoreGraphics.framework */,
@@ -233,22 +268,12 @@
 				999783C314656A83004790E3 /* CodeInputViewController.h */,
 				999783C414656A83004790E3 /* CodeInputViewController.m */,
 				999783C514656A83004790E3 /* CodeInputViewController.xib */,
-				994F25451464AEE600A2809E /* ScenarioListViewController.h */,
-				994F25461464AEE600A2809E /* ScenarioListViewController.m */,
-				994F25471464AEE600A2809E /* ScenarioListViewController.xib */,
-				39B7D2E21465707800324A05 /* ScenarioViewController.h */,
-				39B7D2E31465707800324A05 /* ScenarioViewController.m */,
-				39B7D2E41465707800324A05 /* ScenarioViewController.xib */,
-				39B7D2EE1465781700324A05 /* StepViewController.h */,
-				39B7D2EF1465781700324A05 /* StepViewController.m */,
-				39B7D2F01465781700324A05 /* StepViewController.xib */,
-				39C525A0146599A700467BEC /* UIImageExtensions.h */,
-				39C525A1146599A700467BEC /* UIImageExtensions.m */,
+				39C525AC1465A4B200467BEC /* MainViewController.h */,
+				39C525AD1465A4B200467BEC /* MainViewController.m */,
+				39C525A61465A16400467BEC /* UploadController.h */,
+				39C525A71465A16400467BEC /* UploadController.m */,
+				39C525A414659FF600467BEC /* Not used */,
 				997A2EA914648865003C38BD /* Supporting Files */,
-				994F254B1464AFF700A2809E /* Scenario.h */,
-				994F254C1464AFF700A2809E /* Scenario.m */,
-				999783C014656A70004790E3 /* Scene.h */,
-				999783C114656A70004790E3 /* Scene.m */,
 			);
 			path = Hackathon;
 			sourceTree = "<group>";
@@ -256,10 +281,14 @@
 		997A2EA914648865003C38BD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				39C525B11465F4FB00467BEC /* Icon.png */,
 				997A2EAA14648865003C38BD /* Hackathon-Info.plist */,
 				997A2EAB14648865003C38BD /* InfoPlist.strings */,
 				997A2EAE14648865003C38BD /* main.m */,
 				997A2EB014648865003C38BD /* Hackathon-Prefix.pch */,
+				39C525A91465A2FF00467BEC /* Constants.h */,
+				39C525AA1465A2FF00467BEC /* Constants.m */,
+				39C525AF1465E26C00467BEC /* Settings.bundle */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -450,6 +479,8 @@
 				999783C714656A83004790E3 /* CodeInputViewController.xib in Resources */,
 				39B7D2E61465707800324A05 /* ScenarioViewController.xib in Resources */,
 				39B7D2F21465781700324A05 /* StepViewController.xib in Resources */,
+				39C525B01465E26D00467BEC /* Settings.bundle in Resources */,
+				39C525B21465F4FB00467BEC /* Icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -503,6 +534,9 @@
 				39B7D2E51465707800324A05 /* ScenarioViewController.m in Sources */,
 				39B7D2F11465781700324A05 /* StepViewController.m in Sources */,
 				39C525A2146599A700467BEC /* UIImageExtensions.m in Sources */,
+				39C525A81465A16400467BEC /* UploadController.m in Sources */,
+				39C525AB1465A2FF00467BEC /* Constants.m in Sources */,
+				39C525AE1465A4B200467BEC /* MainViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
