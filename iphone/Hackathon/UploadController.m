@@ -14,7 +14,7 @@
 @interface UploadController()
 -(void)onPictureUploaded:(ASIHTTPRequest *)request;
 -(void)onPushDone:(ASIHTTPRequest *)request;
-- (void)registerDefaultsFromSettingsBundle;
+-(void)saveQueue;
 @end
 
 @implementation UploadController
@@ -22,13 +22,15 @@
 
 -(id)init {
     if ((self = [super init])) {
-        // Init the queue
-        pictureQueue = [[NSMutableArray alloc] initWithCapacity:10];
+        // Get the saved queue or create a new one
+        pictureQueue = (NSMutableArray *)[[NSUserDefaults standardUserDefaults] objectForKey:@"pictureQueue"];
+        if (!pictureQueue) {
+            pictureQueue = [[NSMutableArray alloc] initWithCapacity:10];
+        }
+        [self checkQueue];
         
-        // Get the server URL from preferences
-        [self registerDefaultsFromSettingsBundle];
-        serverUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"server_url"];
-        NSLog(@"Server URL: %@", serverUrl);
+        // Set the server URL
+        serverUrl = SERVER_URL;
     }
     
     return self;
@@ -47,8 +49,9 @@
     CGSize newSize = picture.size.width > picture.size.height ? CGSizeMake(PICTURE_LARGE_SIDE, PICTURE_SMALL_SIDE) : CGSizeMake(PICTURE_SMALL_SIDE, PICTURE_LARGE_SIDE);
     UIImage *resizedPicture = [picture imageByScalingProportionallyToSize:newSize];
     
-    // Add the picture to the queue
+    // Add the picture to the queue and save the queue
     [pictureQueue addObject:UIImageJPEGRepresentation(resizedPicture, PICTURE_COMPRESSION)];
+    [self saveQueue];
     
     // If there was no picture before, we start the upload now
     if ([pictureQueue count] == 1) {
@@ -108,6 +111,7 @@
     
     if ([pictureQueue count] > 0) {
         [pictureQueue removeObjectAtIndex:0];
+        [self saveQueue];
     }
     
     [self checkQueue];
@@ -118,29 +122,9 @@
     [self checkQueue];
 }
 
-
-#pragma mark - Preferences
-
-- (void)registerDefaultsFromSettingsBundle {
-    NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
-    if(!settingsBundle) {
-        NSLog(@"Could not find Settings.bundle");
-        return;
-    }
-    
-    NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:@"Root.plist"]];
-    NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
-    
-    NSMutableDictionary *defaultsToRegister = [[NSMutableDictionary alloc] initWithCapacity:[preferences count]];
-    for(NSDictionary *prefSpecification in preferences) {
-        NSString *key = [prefSpecification objectForKey:@"Key"];
-        if(key) {
-            [defaultsToRegister setObject:[prefSpecification objectForKey:@"DefaultValue"] forKey:key];
-        }
-    }
-    
-    [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
-    [defaultsToRegister release];
+-(void)saveQueue
+{
+    [[NSUserDefaults standardUserDefaults] setObject:pictureQueue forKey:@"pictureQueue"];
 }
 
 @end

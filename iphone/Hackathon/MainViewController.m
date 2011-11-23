@@ -9,6 +9,7 @@
 #import "MainViewController.h"
 
 @interface MainViewController()
+-(void)setupCamera;
 -(void)showCamera;
 @end
 
@@ -81,6 +82,7 @@
     [self showCamera];
     
     // Save the code
+    [[NSUserDefaults standardUserDefaults] setObject:code forKey:@"code"];
     [uploadController performSelectorInBackground:@selector(setChannelId:) withObject:code];
     
 }
@@ -91,6 +93,7 @@
 -(void)setupCamera {
     camera = [[UIImagePickerController alloc] init];
     camera.sourceType = UIImagePickerControllerSourceTypeCamera;
+    //camera.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:camera.sourceType];
     camera.delegate = self;   
 }
 

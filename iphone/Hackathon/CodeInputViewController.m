@@ -13,15 +13,6 @@
 @implementation CodeInputViewController
 @synthesize textField, delegate;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 
 #pragma mark - View lifecycle
 
@@ -29,22 +20,28 @@
 {
     [super viewDidLoad];
     
-    // Set up text field
-    [self.textField becomeFirstResponder];
-    self.textField.delegate = self;
-    self.textField.returnKeyType = UIReturnKeyGo;
-
-    // Title
+    // Set the screen title
     [self.navigationItem setTitle:NSLocalizedString(@"Enter Code", nil)];
+    
+    // Focus on the text field
+    [self.textField becomeFirstResponder];
+    
+    // Pre-fill with the last code if possible
+    NSString *lastCode = [[NSUserDefaults standardUserDefaults] stringForKey:@"code"];
+    if (lastCode && [lastCode length] > 0) {
+        self.textField.text = lastCode;
+    }
 }
 
 
 #pragma mark - UITextFieldDelegate
 
-- (BOOL)textFieldShouldReturn:(UITextField *)field {
+- (BOOL)textFieldShouldReturn:(UITextField *)field
+{
     if (field == self.textField) {
         [self.delegate onEnterCode:textField.text];
     }
+    
     return YES;
 }
 
