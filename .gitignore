@@ -22,6 +22,9 @@ xcuserdata
 
 # Generated files
 VersionX-revision.h
+*.pyc
+*.rdb
+*xcuserdata*
 
 
 # build products

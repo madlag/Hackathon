@@ -63,11 +63,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Hackathon/UploadController.m"
-         timestampString = "343746565.526418"
+         timestampString = "343762341.589799"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "53"
-         endingLineNumber = "53"
+         startingLineNumber = "73"
+         endingLineNumber = "73"
          landmarkName = "-addPictureToUpload:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -77,11 +77,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Hackathon/UploadController.m"
-         timestampString = "343746565.526418"
+         timestampString = "343762341.589799"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "58"
-         endingLineNumber = "58"
+         startingLineNumber = "78"
+         endingLineNumber = "78"
          landmarkName = "-addPictureToUpload:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -91,11 +91,25 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Hackathon/UploadController.m"
-         timestampString = "343746565.526418"
+         timestampString = "343762341.589799"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "89"
-         endingLineNumber = "89"
+         startingLineNumber = "109"
+         endingLineNumber = "109"
+         landmarkName = "-onPictureUploaded:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         isPathRelative = "1"
+         filePath = "Hackathon/UploadController.m"
+         timestampString = "343762341.589799"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "111"
+         endingLineNumber = "111"
          landmarkName = "-onPictureUploaded:"
          landmarkType = "5">
       </FileBreakpoint>

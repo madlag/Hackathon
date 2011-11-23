@@ -18,19 +18,21 @@
 @end
 
 @implementation UploadController
-@synthesize channelId;
 
 -(id)init {
     if ((self = [super init])) {
-        // Get the saved queue or create a new one
+        // Set the server URL
+        serverUrl = SERVER_URL;
+        
+        // Get the saved code if possible
+        channelId = [[[NSUserDefaults standardUserDefaults] stringForKey:@"code"] retain];
+        
+        // Get the saved queues or create a new map
         pictureQueue = (NSMutableArray *)[[NSUserDefaults standardUserDefaults] objectForKey:@"pictureQueue"];
-        if (!pictureQueue) {
+        if (!pictureQueue || !channelId || [channelId length] == 0) {
             pictureQueue = [[NSMutableArray alloc] initWithCapacity:10];
         }
         [self checkQueue];
-        
-        // Set the server URL
-        serverUrl = SERVER_URL;
     }
     
     return self;
@@ -42,6 +44,24 @@
     [serverUrl release];
     [super dealloc];
 }
+
+#pragma mark - Accessors
+
+- (NSString *)channelId
+{
+    return channelId;
+}
+
+- (void)setChannelId:(NSString *)anId
+{
+    if (![channelId isEqualToString:anId]) {
+        [pictureQueue removeAllObjects];
+        [self saveQueue];
+    }
+    channelId = [anId retain];
+}
+
+#pragma mark - Queue management
 
 -(void)addPictureToUpload:(UIImage *)picture {
     
