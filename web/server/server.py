@@ -11,13 +11,19 @@ import eventlet.pools
 import thumb
 import mimetypes
 
+# ------------------------------------------------------------------------------------------------------------------------------------
+
+CURRENT_DIR = os.path.dirname(__file__)
 
 ADRESS="127.0.0.1"
-STORAGE="/tmp/storage/"
-#ADRESS="169.254.205.154"
 PORT = 7000
+STATIC = os.path.join(CURRENT_DIR, 'static')
+
+STORAGE="/tmp/storage/"
 SEP=":"
 DB=3
+
+# ------------------------------------------------------------------------------------------------------------------------------------
 
 class ChannelState:
     pass
@@ -234,9 +240,11 @@ class App:
         elif path.startswith("storage/"):
             return self.handlestorage(path, environ, start_response)
         else:
+            # Serve static files
             if path == "":
                 path = "webclient.html"
-            html_path = os.path.join(os.path.dirname(__file__), path)
+                
+            html_path = os.path.join(STATIC, path)
             try:
                 ret = open(html_path).read()
             except Exception, e:
