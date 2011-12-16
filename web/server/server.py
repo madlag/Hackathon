@@ -12,7 +12,7 @@ import thumb
 import mimetypes
 
 
-ADRESS="0.0.0.0"
+ADRESS="127.0.0.1"
 STORAGE="/tmp/storage/"
 #ADRESS="169.254.205.154"
 PORT = 7000
