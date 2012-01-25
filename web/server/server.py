@@ -20,7 +20,7 @@ ADRESS="127.0.0.1"
 PORT = 7000
 STATIC = os.path.join(CURRENT_DIR, 'static')
 
-STORAGE="/tmp/storage/"
+STORAGE="/home/fabric/src/Hackaton/storage/"
 SEP=":"
 DB=3
 
@@ -249,7 +249,7 @@ class App:
                     if channelId > 0: self.channelId = path
                     path = "webclient.html"
                 except: pass
-            html_path = os.path.join(os.path.dirname(__file__), path)
+            html_path = os.path.join(STATIC, path)
             try:
                 ret = open(html_path).read()
             except Exception, e:
