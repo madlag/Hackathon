@@ -1,0 +1,31 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+  var scenario = {
+    name: "hello world",
+    scenes: [
+      {
+        name: "first",
+        description: "Prends une photo de ton cul",
+        single: true,
+      },
+      {
+        name: "second",
+        description: "Prends 2 photos de celui de ta copine",
+      }
+    ]
+  };
+  
+  
+
+  var socket = io.connect('http://localhost');
+  
+  socket.emit('init', {channelId: '0001', scenario: scenario}, function (res) {
+    console.log(res);
+  });
+  
+  socket.on('update', function(data){
+    console.log(data);
+  });
+
+</script>
