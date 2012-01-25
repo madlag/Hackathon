@@ -1,0 +1,73 @@
+body {
+	background-image:url('../img/black-linen.png');
+	color:white;
+	font-family:'Allerta', sans-serif;
+	text-shadow:0px 0px 10px black;
+}
+
+p {
+	line-height:1.3em;
+}
+
+.container {
+	margin-top:3%;
+}
+
+#picture {
+	text-align:center;
+	font-size:2em;
+}
+
+#title {
+	text-align:center;
+	font-size:5em;
+	margin-top:2%;
+}
+
+#description {
+	text-align:center;
+	font-size:1.5em;
+	margin-top:8%;
+}
+
+#getapp {
+	margin-top:15%;
+	margin-left:5%;
+}
+
+#getapp p {
+	float:left;
+	text-align:center;
+	margin-top:15px;
+	margin-right:20px;
+}
+
+#getapp img {
+	width:200px;
+}
+
+#createevent {
+	margin-top:20%;
+	text-align:center;
+}
+
+#createevent button {
+	width:200px;
+	height:50px;
+	font-size:1.3em;
+}
+
+#newevent {
+	margin-top:20%;
+	text-align:center;
+	font-size:2em;
+}
+
+#newevent p {
+	margin-top:5%;
+	font-size:0.5em;
+}
+
+#eventcode {
+	font-size:1.5em;
+}

@@ -10,6 +10,7 @@ import redis
 import eventlet.pools
 import thumb
 import mimetypes
+import random
 
 
 ADRESS="0.0.0.0"
@@ -94,12 +95,14 @@ def handleweb(ws):
 class App:
     def __init__(self, server, port, storage):
         self.channels = collections.defaultdict(Channel)
-        self.channelId = 0
+        self.channelId = None
         self.redis = redis.Redis("localhost")        
         self.redis = eventlet.pools.Pool(create=lambda: httplib2.Http(timeout=90))
         self.server = server
         self.port = port
         self.storage = storage
+        with REDIS_POOL.item() as client:
+            client.set('channel_id', 100)
 
     def uploadIdAllocate(self):
         with REDIS_POOL.item() as client:
@@ -112,8 +115,8 @@ class App:
         return "http://%s:%s/storage/%s.jpg" % (self.server, self.port, id)
         
     def channelIdAllocate(self):
-        self.channelId += 1
-        return self.channelId
+        with REDIS_POOL.item() as client:
+            return client.incr("channel_id") - 1
 
     def channelGet(self, channelId):
         channel = self.channels[channelId]
@@ -130,23 +133,14 @@ class App:
         self.channels[channelId].clientRemove(client)
         
     def handleweb(self, ws):
+        channelId = self.channelId
         client = None
-        channelId = None
         try:
             m = ws.wait()
             if m is None:
                 return
             m = json.loads(m)
-            channelId = m.get("channelId")
             scenario = m.get("scenario")
-
-            if not channelId:
-                channelId = self.channelIdAllocate()
-
-            channelId = str(channelId)
-
-            if SEP in channelId:
-                return
 
             channel = self.channelGet(channelId)
             if scenario != None:
@@ -218,7 +212,11 @@ class App:
         filename = os.path.join(self.storage, filename)
         data = open(filename).read()
         start_response('200 OK', [('content-type', 'image/jpeg')])
-        return [data]        
+        return [data]
+    
+    def handlenew(self, environ, start_response):
+        start_response('200 OK', [('content-type', 'text/plain')])
+        return [str(self.channelIdAllocate())]
 
     def dispatch(self, environ, start_response):
         """Resolves to the web page or the websocket depending on the path."""
@@ -233,9 +231,17 @@ class App:
             return self.handleupload(environ, start_response)
         elif path.startswith("storage/"):
             return self.handlestorage(path, environ, start_response)
+        elif path.startswith("new/"):
+            return self.handlenew(environ, start_response)
         else:
             if path == "":
-                path = "webclient.html"
+                path = "landing.html"
+            else:
+                try:
+                    channelId = int(path)
+                    if channelId > 0: self.channelId = path
+                    path = "webclient.html"
+                except: pass
             html_path = os.path.join(os.path.dirname(__file__), path)
             try:
                 ret = open(html_path).read()

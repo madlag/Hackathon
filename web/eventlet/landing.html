@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf8"/>
+		<title>We Snap</title>
+		<meta name="description" content=""/>
+		<meta name="author" content="Stupeflix"/>
+		
+		<!-- HTML 5 fix for IE6-8-->
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		
+		<!-- Stylesheets -->
+		<link href="http://fonts.googleapis.com/css?family=Allerta" rel="stylesheet"/>
+		<link href="./css/bootstrap.min.css" rel="stylesheet"/>
+		<link href="./css/landing.css" rel="stylesheet"/>
+		
+		<!-- jQuery -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+	</head>
+	
+	<body>
+		<div class="container">
+			<div class="row">
+				
+				<div id="picture" class="span8">
+					<img src="./img/picture.jpg"/>
+				</div>
+				
+				<div class="span8">
+					
+					<p id="title">We Snap</p>
+					
+					<p id="description">
+						Create an event and share its code with your friends to let them add photos to your slideshow <strong>LIVE</strong> from their iPhones!
+					</p>
+					
+					<div id="getapp">
+						<p>
+							Want to join an existing event?<br/>
+							Get <strong>We Snap</strong> on the iPhone!
+						</p>
+						<a href="#" title="Get We Snap on the App Store">
+							<img src="./img/appstore.png" alt="iPhone App Store"/>
+						</a>
+					</div>
+					
+					<div id="createevent">
+						<button class="btn success">Create an event</button>
+					</div>
+					
+					<div id="newevent" style="display:none">
+						Your Event Number: <span id="eventcode"></span>
+						<p>
+							Share this code with your friends who have <strong>We Snap</strong> on their iPhones!<br/><br/>
+							View your slideshow at <span id="eventurl"></span>
+						</p>
+					</div>
+					
+				</div>
+				
+			</div>
+		</div>
+		
+		<script>
+			$('#createevent button').click(function() {
+				$.get('new/', function(data) {
+					$('#createevent').fadeOut(250, function() {
+						pageUrl = window.location.toString();
+						url = pageUrl+data;
+						$('#eventcode').text(data);
+						$('#eventurl').html('<a href="'+url+'">'+url+'</a>');
+						$('#newevent').fadeIn(250);
+					});
+				})
+			});
+		</script>
+	</body>
+</html>
