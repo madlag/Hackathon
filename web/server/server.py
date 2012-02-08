@@ -153,9 +153,8 @@ class App:
                 channel.scenarioSet(scenario)
                 
             client = self.clientAdd(channelId, ws)        
-            message = json.dumps({"type":"imageset", "value":{"channelId":channelId, "data":channel.dataGet()}})
-            print message
-            client.message(message)
+
+            client.message(json.dumps({"type":"imageset", "value":{"channelId":channelId, "data":channel.dataGet()}}))
 
             while True:
                 m = ws.wait()
