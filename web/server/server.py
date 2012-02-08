@@ -154,7 +154,9 @@ class App:
                 
             client = self.clientAdd(channelId, ws)        
 
-            client.message(json.dumps({"type":"imageset", "value":{"channelId":channelId, "data":channel.dataGet()}}))
+            message = json.dumps({"type":"imageset", "value":{"channelId":channelId, "data":channel.dataGet()}})
+            print message
+            client.message(message)
 
             while True:
                 m = ws.wait()
