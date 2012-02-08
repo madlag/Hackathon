@@ -20,7 +20,7 @@ ADRESS="127.0.0.1"
 PORT = 7000
 STATIC = os.path.join(CURRENT_DIR, 'static')
 
-STORAGE="/home/fabric/src/Hackaton/storage/"
+STORAGE="/home/fabric/src/Hackathon/storage/"
 SEP=":"
 DB=3
 
