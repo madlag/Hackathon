@@ -60,7 +60,7 @@
       var req = new Sx.Url(window.location.toString());
       this.code = req.params.code;
       
-      this.socket = new WebSocket("ws://0.0.0.0:7000/webclient/");  
+      this.socket = new WebSocket("ws://wesnap.stupeflix.com/webclient/");  
       this.socket.onopen = this.proxy('initSocket');
       this.socket.onmessage = this.proxy('dispatchMessage');
       
