@@ -193,7 +193,7 @@ UpdatePhotoCallback.prototype = {
             var parent = node.getParents()[0];
             var m = node.getWorldMatrices()[0];
             range = 400;
-            var depth = -1000;
+            var depth = -2000;
 
             var effect = getOrCreateWindEffect(node.texture, [(-0.5+Math.random())*range, depth, (-0.5+Math.random())*range], m, 0.0, Width);
 
@@ -340,6 +340,16 @@ Organizer.prototype = {
 
         var rand = (-0.5 + Math.random()) * 0.0;
         osg.Matrix.preMult(node.getMatrix(), osg.Matrix.makeRotate(rand*0.1*Math.PI,0,1,0, []));
+
+        // release ressources in a delay
+        if (true) {
+            setTimeout( function() {
+                node.removeChildren();
+                q.getOrCreateStateSet().getTextureAttribute(0, osg.Texture.prototype.attributeType).releaseGLObjects(Viewer.getState().getGraphicContext());
+                q.releaseGLObjects(Viewer.getState().getGraphicContext());
+            }, 7500);
+        }
+        
     },
 
 
@@ -497,6 +507,8 @@ World.prototype = {
             }
             loadImage(url, g);
         }
+        // just for test, hit space to generate images
+        //this._news = this._used = [];
     },
 
     retryLater: function() {

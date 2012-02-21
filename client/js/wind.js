@@ -29,6 +29,24 @@ var TransitionUpdateCallback = function(target) {
 var createWindEffect2 = function(texture, target, matrix, time, width, initialSpeed, origGroup)
 {
     initialSpeed = [0,0,0] ; //
+    var ReleaseObject = function() {
+        this._elements = [];
+        this.push = function(o) {
+            this._elements.push(o);
+        };
+        this.doit = function() {
+            var gl = Viewer.getState().getGraphicContext();
+            var e = this._elements;
+            osg.log("release box " + e.length);
+            for (var i = 0, l = e.length; i < l; i++) {
+                e[i].releaseGLObjects(gl);
+            }
+            e.splice(0, e.length);
+            osg.log("current number vertex buffer " + osg.BufferArray.manager._numObject + " - create/release " + osg.BufferArray.nbCreate + "/" + osg.BufferArray.nbRelease);
+        };
+
+    };
+    var arrayOfObjectToRelease = new ReleaseObject();
 
     var createTexturedBox = function(centerx, centery, centerz,
                                      sizex, sizey, sizez,
@@ -194,6 +212,7 @@ var createWindEffect2 = function(texture, target, matrix, time, width, initialSp
                                           size[0], size[1], size[2],
                                           uvs[0][0] + ulenght*x/(maxx), uvs[0][0] + ulenght*(x+1)/(maxx),
                                           uvs[0][1] + vlenght*y/(maxy), uvs[0][1] + vlenght*(y+1)/(maxy), origModel );
+            arrayOfObjectToRelease.push(model);
 
             if (origModel === undefined) {
                 mtr.addChild(model);
@@ -219,6 +238,18 @@ var createWindEffect2 = function(texture, target, matrix, time, width, initialSp
             osg.Vec3.normalize(mtr._axis, mtr._axis);
         }
     }
+
+    var getFunction = function(arg) {
+        var o = arg;
+        var f = function() {
+            console.log();
+            o.doit();
+        };
+        return f;
+    };
+    setTimeout(getFunction(arrayOfObjectToRelease), 5000);
+
+    osg.log("create box " + (maxy*maxx).toString() + " - create/release " + osg.BufferArray.nbCreate + "/" + osg.BufferArray.nbRelease);
 
     return group;
 };
@@ -261,7 +292,7 @@ TransitionUpdateCallback.prototype = {
         this._target = target;
     },
     getVelocityField: function (posOri, time ) {
-        var t = time/1000.0 % 2.0;
+        var t = time/1000.0 % 0.5;
         var pos = posOri.slice(0);
         var scale = 1.0/100.0;
         pos[0]*= scale; 
@@ -283,16 +314,16 @@ TransitionUpdateCallback.prototype = {
         startFade *= startFade;
         var fadeRatio = osgAnimation.EaseInCubic(Math.min(distanceSqr/startFade, 1.0));
         var stop = 4.0;
-        var duration = 4.0;
-        var timeFade = dt - stop;
-        timeFade = Math.max(timeFade, 0.0)/duration;
-        fadeRatio *= Math.max((1.0-timeFade), 0.0);
+        var timeFade = stop-dt;
+        timeFade = Math.max(timeFade, 0.0)/stop;
+        fadeRatio *= timeFade;
 
         var alphaUniform = stateset.getUniform('fade');
         if (alphaUniform === undefined) {
             alphaUniform = osg.Uniform.createFloat1(1.0, 'fade');
             stateset.addUniform(alphaUniform);
         }
+        //osg.log("fade ratio " + fadeRatio + " dt " + dt);
         if (fadeRatio < 0.01) {
             return false;
         }
@@ -353,7 +384,7 @@ TransitionUpdateCallback.prototype = {
         var delta = [];
         osg.Vec3.sub(node._currentPosition, node._lastPosition, delta);
         
-        var speedSqr = delta[0] * delta[0] + delta[1] * delta[1] + delta[2]*delta[2];
+        speedSqr = delta[0] * delta[0] + delta[1] * delta[1] + delta[2]*delta[2];
         //var windFactor = - Math.min(2.0 * speedSqr * dt, 1000.0);
         var windFactor = - 0.01 * speedSqr;
         var windVector = [ windFactor*delta[0],
@@ -478,9 +509,15 @@ var createWindEffect = function(texture, target, matrix, time, width, initialSpe
     };
 
 
-
-    var uvs = cropImage(texture.getImage().width,
-                        texture.getImage().height,
+    var image = texture.getImage();
+    var wi = 0;
+    var hi = 0;
+    if (image) {
+        wi = image.width;
+        hi = image.height;
+    }
+    var uvs = cropImage(wi,
+                        hi,
                         Ratio,
                         Width);
 
