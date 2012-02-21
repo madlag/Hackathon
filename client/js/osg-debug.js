@@ -2554,7 +2554,7 @@ var BufferArrayManager = function() {
         var buffers = this._buffers[type];
         if (buffers.length === 0) {
             this._numObject++;
-            //osg.log("current number vertex buffer " + this._numObject);
+            osg.info("current number vertex buffer " + this._numObject);
             return gl.createBuffer();
         }
         return buffers.pop();
@@ -6403,7 +6403,7 @@ var TextureManager = function() {
     this.getOrCreate = function(gl) {
         if (this._buffers.length === 0) {
             this._numObject++;
-            osg.log("current nb texture " + this._numObject);
+            osg.info("current nb texture " + this._numObject);
             return gl.createTexture();
         }
         return this._buffers.pop();

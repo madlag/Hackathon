@@ -37,12 +37,12 @@ var createWindEffect2 = function(texture, target, matrix, time, width, initialSp
         this.doit = function() {
             var gl = Viewer.getState().getGraphicContext();
             var e = this._elements;
-            osg.log("release box " + e.length);
+            osg.debug("release box " + e.length);
             for (var i = 0, l = e.length; i < l; i++) {
                 e[i].releaseGLObjects(gl);
             }
             e.splice(0, e.length);
-            osg.log("current number vertex buffer " + osg.BufferArray.manager._numObject + " - create/release " + osg.BufferArray.nbCreate + "/" + osg.BufferArray.nbRelease);
+            osg.debug("current number vertex buffer " + osg.BufferArray.manager._numObject + " - create/release " + osg.BufferArray.nbCreate + "/" + osg.BufferArray.nbRelease);
         };
 
     };
@@ -249,7 +249,7 @@ var createWindEffect2 = function(texture, target, matrix, time, width, initialSp
     };
     setTimeout(getFunction(arrayOfObjectToRelease), 5000);
 
-    osg.log("create box " + (maxy*maxx).toString() + " - create/release " + osg.BufferArray.nbCreate + "/" + osg.BufferArray.nbRelease);
+    osg.debug("create box " + (maxy*maxx).toString() + " - create/release " + osg.BufferArray.nbCreate + "/" + osg.BufferArray.nbRelease);
 
     return group;
 };
