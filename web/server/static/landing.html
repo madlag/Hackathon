@@ -58,16 +58,31 @@
 		</div>
 		
 		<script>
+			function onUserLocated(position) {
+				remoteService = 'new/' + position.coords.latitude + '-' + position.coords.longitude;
+				$.get(remoteService, fadeCreateEventButton);
+			}
+
+			function onLocationError(errorMsg) {
+				console.error('Geolocation error: ' + errorMsg);
+			}
+
+			function fadeCreateEventButton(code) {
+				$('#createevent').fadeOut(250, function() {
+					pageUrl = window.location.toString();
+					url = pageUrl+code;
+					$('#eventcode').text(code);
+					$('#eventurl').html('<a href="'+url+'">'+url+'</a>');
+					$('#newevent').fadeIn(250);
+				});
+			}
+
 			$('#createevent button').click(function() {
-				$.get('new/', function(data) {
-					$('#createevent').fadeOut(250, function() {
-						pageUrl = window.location.toString();
-						url = pageUrl+data;
-						$('#eventcode').text(data);
-						$('#eventurl').html('<a href="'+url+'">'+url+'</a>');
-						$('#newevent').fadeIn(250);
-					});
-				})
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(onUserLocated, onLocationError);
+				} else {
+					console.error('Geolocation unavailable on this browser!');
+				}
 			});
 		</script>
 	</body>
