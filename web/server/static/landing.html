@@ -35,7 +35,9 @@
 			</p>
 			
 			<div id="createevent">
-				<button class="btn primary">Create an event</button>
+				<input type="text" class="span4" placeholder="Choose an event name...">
+				<button type="submit" class="btn primary">Create</button>
+				<p class="error" style="display:none">Error text</p>
 			</div>
 		
 			<div id="newevent" style="display:none">
@@ -58,13 +60,14 @@
 		</div>
 		
 		<script>
-			function onUserLocated(position) {
-				remoteService = 'new/' + position.coords.latitude + '-' + position.coords.longitude;
+			function createEvent(eventName, position) {
+				remoteService = 'new/' + encodeURIComponent(eventName) + '/' + position.coords.latitude + '-' + position.coords.longitude;
 				$.get(remoteService, fadeCreateEventButton);
 			}
 
 			function onLocationError(errorMsg) {
-				console.error('Geolocation error: ' + errorMsg);
+				$('#createevent p.error').text("Couldn't locate your position. Please try again.");
+				$('#createevent p.error').show();
 			}
 
 			function fadeCreateEventButton(code) {
@@ -78,10 +81,19 @@
 			}
 
 			$('#createevent button').click(function() {
-				if (navigator.geolocation) {
-					navigator.geolocation.getCurrentPosition(onUserLocated, onLocationError);
+				eventName = $('#createevent input').attr('value');
+				if (eventName == "") {
+					$('#createevent p.error').text("The event name is required.");
+					$('#createevent p.error').show();
 				} else {
-					console.error('Geolocation unavailable on this browser!');
+					$('#createevent p.error').hide();
+					if (navigator.geolocation) {
+						navigator.geolocation.getCurrentPosition(function(position) {
+							createEvent(eventName, position);
+						}, onLocationError);
+					} else {
+						onLocationError(null);
+					}
 				}
 			});
 		</script>

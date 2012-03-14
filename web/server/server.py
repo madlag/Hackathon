@@ -228,11 +228,14 @@ class App:
     def handlenew(self, path, environ, start_response):
         # Allocate channel ID
         channelId = self.channelIdAllocate()
-        lat, lon = path.split('new/').pop().split('-')
+        params = path.split('new/').pop()
+        name, location = params.split('/')[0:2]
+        lat, lon = location.split('-')
 
-        # Index channel's geoloc
+        # Index channel's geoloc and name
         geoloc = geohash.encode_uint64(float(lat), float(lon))
         with REDIS_POOL.item() as client:
+            client.hset('names', channelId, name)
             client.zadd('locations', channelId, geoloc)
 
         # Return channel ID
@@ -246,7 +249,10 @@ class App:
         results = []
         with REDIS_POOL.item() as client:
             for low,high in query_ranges:
-                results += client.zrangebyscore('locations', low, high)
+                for channelId in client.zrangebyscore('locations', low, high):
+                    name = client.hget('names', channelId)
+                    results.append({'id': channelId, 'name': name})
+
         start_response('200 OK', [('content-type', 'application/json')])
         return json.dumps(results)
 
