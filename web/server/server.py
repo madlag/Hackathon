@@ -11,16 +11,19 @@ import eventlet.pools
 import thumb
 import mimetypes
 import random
+import geohash
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 
 CURRENT_DIR = os.path.dirname(__file__)
 
 ADRESS="127.0.0.1"
+#ADRESS="0.0.0.0"
 PORT = 7000
 STATIC = os.path.join(CURRENT_DIR, 'static')
 
 STORAGE="/home/fabric/src/Hackathon/storage/"
+#STORAGE="/tmp/storage/"
 SEP=":"
 DB=3
 
@@ -93,7 +96,8 @@ class Channel:
 
 
 @websocket.WebSocketWSGI
-def handleweb(ws):        
+def handleweb(ws):
+    print "handleweb"        
     app = ws.environ["APP"]
     app.handleweb(ws)
 
@@ -139,6 +143,7 @@ class App:
         self.channels[channelId].clientRemove(client)
         
     def handleweb(self, ws):
+        print "self handleweb"
         channelId = self.channelId
         client = None
         try:
@@ -220,16 +225,38 @@ class App:
         start_response('200 OK', [('content-type', 'image/jpeg')])
         return [data]
     
-    def handlenew(self, environ, start_response):
+    def handlenew(self, path, environ, start_response):
+        # Allocate channel ID
+        channelId = self.channelIdAllocate()
+        lat, lon = path.split('new/').pop().split('-')
+
+        # Index channel's geoloc
+        geoloc = geohash.encode_uint64(float(lat), float(lon))
+        with REDIS_POOL.item() as client:
+            client.zadd('locations', channelId, geoloc)
+
+        # Return channel ID
         start_response('200 OK', [('content-type', 'text/plain')])
-        return [str(self.channelIdAllocate())]
+        return [str(channelId)]
+
+    def handleevents(self, path, environ, start_response):
+        lat, lon = path.split('events/').pop().split('-')
+        geoloc = geohash.encode_uint64(float(lat), float(lon))
+        query_ranges = geohash.expand_uint64(geoloc, 30)
+        results = []
+        with REDIS_POOL.item() as client:
+            for low,high in query_ranges:
+                results += client.zrangebyscore('locations', low, high)
+        start_response('200 OK', [('content-type', 'application/json')])
+        return json.dumps(results)
 
     def dispatch(self, environ, start_response):
         """Resolves to the web page or the websocket depending on the path."""
-    #   print environ
+        #print environ
         path = environ['PATH_INFO'][1:]
         environ["APP"] = self
         if path.startswith('webclient/'):
+            print "dispatch webclient"
             return handleweb(environ, start_response)
         elif path.startswith("iosclient/"):
             return self.handleios(environ, start_response)
@@ -238,7 +265,9 @@ class App:
         elif path.startswith("storage/"):
             return self.handlestorage(path, environ, start_response)
         elif path.startswith("new/"):
-            return self.handlenew(environ, start_response)
+            return self.handlenew(path, environ, start_response)
+        elif path.startswith("events/"):
+            return self.handleevents(path, environ, start_response)
         else:
             # Serve static files
             if path == "":
