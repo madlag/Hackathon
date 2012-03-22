@@ -42,8 +42,8 @@ header {
 
 #description {
 	width:90%;
-	margin-left:5%; margin-right:5%;
-	height:30%;
+	margin-left:5%; margin-right:5%; margin-top:2%;
+	height:18%;
 	text-align:center;
 	font-size:18px;
 	line-height:140%;
@@ -56,32 +56,50 @@ header {
 	font-size:18px;
 }
 
-#createevent input {
-	height:30px;
-	font-size:18px;
-	padding-top:6px;
-	margin-right:10px;
-}
-
-#createevent button {
-	width:100px;
-	height:40px;
-	font-size:18px;
-}
-
-#createevent p.error {
-	color:red;
-	margin-top:5px;
+#newevent {
+	margin-top:10%;
+	font-size:24px;
 }
 
 #newevent p {
 	margin-top:5%;
-	font-size:12px;
+	font-size:14px;
 	line-height:160%;
 }
 
-#eventcode {
-	font-size:36px;
+#createevent input {
+	width:250px;
+	height:30px;
+	font-size:18px;
+	padding-top:6px;
+	margin-right:10px;
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+#createevent button {
+	width:150px;
+	height:40px;
+	margin-top:15px;
+	font-size:18px;
+}
+
+#createevent .error {
+	color:red;
+	font-size:12px;
+	margin:0px;
+}
+
+.pac-container {
+	padding-top:2px;
+	padding-bottom:2px;
+}
+
+.pac-item {
+	font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size:12px;
+	color:black;
+	text-shadow:none;
 }
 
 #getapp {

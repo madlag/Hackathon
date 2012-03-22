@@ -229,8 +229,7 @@ class App:
         # Allocate channel ID
         channelId = self.channelIdAllocate()
         params = path.split('new/').pop()
-        name, location = params.split('/')[0:2]
-        lat, lon = location.split('-')
+        name, lat, lon = params.split('/')[0:3]
 
         # Index channel's geoloc and name
         geoloc = geohash.encode_uint64(float(lat), float(lon))
@@ -243,7 +242,7 @@ class App:
         return [str(channelId)]
 
     def handleevents(self, path, environ, start_response):
-        lat, lon = path.split('events/').pop().split('-')
+        lat, lon = path.split('events/').pop().split('/')
         geoloc = geohash.encode_uint64(float(lat), float(lon))
         query_ranges = geohash.expand_uint64(geoloc, 30)
         results = []

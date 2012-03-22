@@ -19,6 +19,9 @@
 		<!-- jQuery -->
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+
+		<!-- Google Maps -->
+		<script src="http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places" type="text/javascript"></script>
 	</head>
 	
 	<body>
@@ -31,19 +34,19 @@
 			<header>We Snap</header>
 			
 			<p id="description">
-				Create an event and share its code with your friends to let them add photos to your slideshow <strong>LIVE</strong> from their iPhones!
+				Create an event and let people add photos to your slideshow <strong>LIVE</strong> from their iPhones!
 			</p>
 			
 			<div id="createevent">
-				<input type="text" class="span4" placeholder="Choose an event name...">
-				<button type="submit" class="btn primary">Create</button>
-				<p class="error" style="display:none">Error text</p>
+				<input id="eventName" type="text" placeholder="What's your event's name?"><br>
+				<input id="eventAddress" type="text" placeholder="Where does it take place?"><br>
+				<p class="error" style="display:none"></p>
+				<button id="eventSubmit" type="submit" class="btn primary">Create Event</button>
 			</div>
 		
 			<div id="newevent" style="display:none">
-				Your Event Number: <span id="eventcode"></span>
+				Event created!
 				<p>
-					Share this code with your friends!<br/>
 					View your slideshow at <span id="eventurl"></span>
 				</p>
 			</div>
@@ -60,41 +63,42 @@
 		</div>
 		
 		<script>
-			function createEvent(eventName, position) {
-				remoteService = 'new/' + encodeURIComponent(eventName) + '/' + position.coords.latitude + '-' + position.coords.longitude;
-				$.get(remoteService, fadeCreateEventButton);
-			}
+			var geocoder;
 
-			function onLocationError(errorMsg) {
-				$('#createevent p.error').text("Couldn't locate your position. Please try again.");
-				$('#createevent p.error').show();
+			function createEvent(eventName, position) {
+				remoteService = 'new/' + encodeURIComponent(eventName) + '/' + position.lat() + '/' + position.lng();
+				$.get(remoteService, fadeCreateEventButton);
 			}
 
 			function fadeCreateEventButton(code) {
 				$('#createevent').fadeOut(250, function() {
 					pageUrl = window.location.toString();
 					url = pageUrl+code;
-					$('#eventcode').text(code);
 					$('#eventurl').html('<a href="'+url+'">'+url+'</a>');
 					$('#newevent').fadeIn(250);
 				});
 			}
 
 			$('#createevent button').click(function() {
-				eventName = $('#createevent input').attr('value');
-				if (eventName == "") {
-					$('#createevent p.error').text("The event name is required.");
-					$('#createevent p.error').show();
+				var eventName = document.getElementById('eventName').value;
+				var eventAddress = document.getElementById('eventAddress').value;
+				if (eventName == "" || eventAddress == "") {
+					$("#createevent p.error").text("Both fields are required.").slideDown(100);
 				} else {
-					$('#createevent p.error').hide();
-					if (navigator.geolocation) {
-						navigator.geolocation.getCurrentPosition(function(position) {
-							createEvent(eventName, position);
-						}, onLocationError);
-					} else {
-						onLocationError(null);
-					}
+					geocoder.geocode({'address': eventAddress}, function(results, status) {
+						if (status == google.maps.GeocoderStatus.OK) {
+							createEvent(eventName, results[0].geometry.location);
+						} else {
+							$('#createevent p.error').text("Couldn't locate the address entered!").slideDown(100);
+						}
+					});
 				}
+			});
+
+			$(function() {
+				var eventAddress = document.getElementById('eventAddress');
+				var autocomplete = new google.maps.places.Autocomplete(eventAddress);
+				geocoder = new google.maps.Geocoder();
 			});
 		</script>
 	</body>
